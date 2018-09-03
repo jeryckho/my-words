@@ -1,6 +1,10 @@
 <template>
   <window>
-    <toolbar type="header" title="Header"></toolbar>
+    <toolbar type="header" title="Header">
+      <toolbar-actions>
+
+      </toolbar-actions>
+    </toolbar>
     <window-content>
       <pane-group>
         <pane size="sm" :sidebar="true">sidebar</pane>
@@ -42,13 +46,13 @@
 </template>
 
 <script>
-import { Window, WindowContent, PaneGroup, Pane, Toolbar } from 'vue-photonkit'
+import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions } from 'vue-photonkit'
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
   },
-  components: { Window, WindowContent, PaneGroup, Pane, Toolbar }
+  components: { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions }
 }
 </script>
 
