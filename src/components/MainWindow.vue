@@ -1,15 +1,15 @@
 <template>
-  <window>
-    <toolbar type="header" title="Header">
-      <toolbar-actions>
+  <Window>
+    <Toolbar type="header" title="Header">
+      <ToolbarActions>
 
-      </toolbar-actions>
-    </toolbar>
-    <window-content>
-        <pane-group>
-          <pane size="mini" :sidebar="true" style="display:block">sidebar</pane>
-          <pane>
-            <vue-split
+      </ToolbarActions>
+    </Toolbar>
+    <WindowContent>
+        <PaneGroup>
+          <Pane size="mini" :sidebar="true" style="display:block">sidebar</Pane>
+          <Pane>
+            <VueSplit
               :elements="panes"
               direction="horizontal"
               :min-size="100"
@@ -47,12 +47,12 @@
                   <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
                 </ul>
               </div>
-            </vue-split>
-          </pane>
-        </pane-group>
-      </window-content>
-    <toolbar type="footer" title="Footer"></toolbar>
-</window>
+            </VueSplit>
+          </Pane>
+        </PaneGroup>
+      </WindowContent>
+    <Toolbar type="footer" title="Footer"></Toolbar>
+</Window>
 </template>
 
 <script>
