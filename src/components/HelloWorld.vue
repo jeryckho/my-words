@@ -10,10 +10,7 @@
           <pane size="mini" :sidebar="true" style="display:block">sidebar</pane>
           <pane>
             <vue-split
-              :elements="[
-                '#mainPane',
-                '#altPane'
-              ]"
+              :elements="panes"
               direction="horizontal"
               :min-size="100"
               :gutter-size="10"
@@ -59,13 +56,16 @@
 </template>
 
 <script>
-import VueSplit from 'vue-splitjs'
-import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions } from 'vue-photonkit'
+import VueSplit from "vue-splitjs";
+import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions } from "vue-photonkit";
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
   props: {
     msg: String
   },
+  data: () => ({
+    panes: ["#mainPane", "#altPane"]
+  }),
   components: { VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions }
 }
 </script>
