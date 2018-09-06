@@ -27,6 +27,16 @@
               :snap-offset="50"
             >
               <div id="mainPane" :class="{invisible: !shown.mainPane}">
+                <TabGroup>
+                  <TabItem :active="true">
+                    Test 1
+                  </TabItem>                  
+                  <TabItem>
+                    Test 2
+                  </TabItem>                  
+                  <TabItem :fixed="true" icon="plus">
+                  </TabItem>                  
+                </TabGroup>
                 <editor
                   v-model="content"
                   @init="editorInit"
@@ -50,7 +60,7 @@
 
 <script>
 import VueSplit from "./VueSplit.vue";
-import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon } from "vue-photonkit";
+import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
 import Marked from "marked"
 
 export default {
@@ -89,7 +99,7 @@ export default {
       }
   },
   components: {
-    VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon,
+    VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem,
     editor: require('vue2-ace-editor')
   }
 }
