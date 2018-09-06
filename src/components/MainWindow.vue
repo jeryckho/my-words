@@ -13,11 +13,11 @@
             <Icon icon="tools"></Icon>
           </Button>
         </ButtonGroup>
-        <ButtonGroup class="pull-right"  :class="{invisible: !shown.altPane}">
-          <Button size="sm" :active="selected=='rendu'" @click.native="selected='rendu'">
+        <ButtonGroup class="pull-right"  :class="{hidden: !shown.altPane}">
+          <Button size="sm" :active="selected=='sRendu'" @click.native="selected='sRendu'">
             <Icon icon="doc-text"></Icon>
           </Button>
-          <Button size="sm" :active="selected=='ftmt'" @click.native="selected='ftmt'">
+          <Button size="sm" :active="selected=='sFront'" @click.native="selected='sFront'">
             <Icon icon="info"></Icon>
           </Button>
         </ButtonGroup>
@@ -25,7 +25,7 @@
     </Toolbar>
     <WindowContent>
         <PaneGroup>
-          <Pane size="mini" :sidebar="true" :class="{invisible: !shown.sidebar}">sidebar</Pane>
+          <Pane size="mini" :sidebar="true" :class="{hidden: !shown.sidebar}">sidebar</Pane>
           <Pane>
             <VueSplit
               :elements="panes"
@@ -34,30 +34,29 @@
               :gutter-size="10"
               :snap-offset="50"
             >
-              <div id="mainPane" :class="{invisible: !shown.mainPane}">
+              <div id="mainPane" :class="{hidden: !shown.mainPane}">
                 <TabGroup>
-                  <TabItem :active="true">
-                    Test 1
+                  <TabItem :active="true" :class="{hidden: !hasFile}">
+                    Untitled
                   </TabItem>
-                  <TabItem>
-                    Test 2
-                  </TabItem>
-                  <TabItem :fixed="true" icon="plus">
+                  <TabItem :fixed="true" icon="plus" @click.native="hasFile=true">
                   </TabItem>
                 </TabGroup>
-                <editor
-                  v-model="content"
-                  @init="editorInit"
-                  lang="markdown"
-                  theme="chrome"
-                  width="100%"
-                  height="100%"
-                >
-                </editor>
+                <div class="expanded" :class="{hidden: !hasFile}" >
+                  <editor
+                    v-model="content"
+                    @init="editorInit"
+                    lang="markdown"
+                    theme="chrome"
+                    width="100%"
+                    height="100%"
+                  >
+                  </editor>
+                </div>
               </div>
-              <div id="altPane" class="hello" :class="{invisible: !shown.altPane}" style="overflow-y:auto;">
-                <div v-html="marked" :class="{invisible: selected != 'rendu'}"></div>
-                <div v-html="jshtm" :class="{invisible: selected != 'ftmt'}"></div>
+              <div id="altPane" :class="{hidden: !shown.altPane}" style="overflow-y:auto;">
+                <div v-html="marked" :class="{hidden: selected != 'sRendu'}"></div>
+                <div v-html="jshtm" :class="{hidden: selected != 'sFront'}"></div>
               </div>
             </VueSplit>
           </Pane>
@@ -80,12 +79,13 @@ export default {
     msg: String
   },
   data: () => ({
+    hasFile: false,
     content: "",
-    selected: "rendu",
+    selected: "sRendu",
     shown: {
-      sidebar: true,
+      sidebar: false,
       mainPane : true,
-      altPane: true
+      altPane: false
     }
   }),
   computed: {
@@ -125,7 +125,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.invisible {
+.hidden {
   display: none;
+}
+.expanded {
+  width: 100%;
+  height: 100%;
 }
 </style>
