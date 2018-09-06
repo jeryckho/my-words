@@ -13,6 +13,14 @@
             <Icon icon="tools"></Icon>
           </Button>
         </ButtonGroup>
+        <ButtonGroup class="pull-right"  :class="{invisible: !shown.altPane}">
+          <Button size="sm" :active="selected=='rendu'" @click.native="selected='rendu'">
+            <Icon icon="doc-text"></Icon>
+          </Button>
+          <Button size="sm" :active="selected=='ftmt'" @click.native="selected='ftmt'">
+            <Icon icon="info"></Icon>
+          </Button>
+        </ButtonGroup>
       </ToolbarActions>
     </Toolbar>
     <WindowContent>
@@ -30,12 +38,12 @@
                 <TabGroup>
                   <TabItem :active="true">
                     Test 1
-                  </TabItem>                  
+                  </TabItem>
                   <TabItem>
                     Test 2
-                  </TabItem>                  
+                  </TabItem>
                   <TabItem :fixed="true" icon="plus">
-                  </TabItem>                  
+                  </TabItem>
                 </TabGroup>
                 <editor
                   v-model="content"
@@ -48,7 +56,8 @@
                 </editor>
               </div>
               <div id="altPane" class="hello" :class="{invisible: !shown.altPane}" style="overflow-y:auto;">
-                <div v-html="marked"></div>
+                <div v-html="marked" :class="{invisible: selected != 'rendu'}"></div>
+                <div v-html="jshtm" :class="{invisible: selected != 'ftmt'}"></div>
               </div>
             </VueSplit>
           </Pane>
@@ -59,8 +68,10 @@
 </template>
 
 <script>
+import jthf from "json-to-html-form"
 import VueSplit from "./VueSplit.vue";
 import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
+import * as matter from 'gray-matter';
 import Marked from "marked"
 
 export default {
@@ -70,6 +81,7 @@ export default {
   },
   data: () => ({
     content: "",
+    selected: "rendu",
     shown: {
       sidebar: true,
       mainPane : true,
@@ -77,12 +89,14 @@ export default {
     }
   }),
   computed: {
+    mattered: function() {
+      return matter(this.content);
+    },
     marked: function () {
-      if (this.content.startsWith("---")) {
-        return Marked(this.content.replace(/^---[\n\r][\s\S]+---[\n\r]/,""));
-      } else {
-        return Marked(this.content);
-      }
+      return Marked(this.mattered.content);
+    },
+    jshtm: function () {
+      return jthf.getForm(this.mattered.data);
     },
     panes: function() {
       var res = [];
