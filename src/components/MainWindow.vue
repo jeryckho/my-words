@@ -78,7 +78,11 @@ export default {
   }),
   computed: {
     marked: function () {
-      return Marked(this.content);
+      if (this.content.startsWith("---")) {
+        return Marked(this.content.replace(/^---[\n\r][\s\S]+---[\n\r]/,""));
+      } else {
+        return Marked(this.content);
+      }
     },
     panes: function() {
       var res = [];
