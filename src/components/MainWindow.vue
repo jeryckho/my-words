@@ -51,6 +51,7 @@
                     theme="chrome"
                     width="100%"
                     height="100%"
+                    @click.right.native="clkCtx"
                   >
                   </editor>
                 </div>
@@ -116,11 +117,25 @@ export default {
     }
   },
   methods: {
-      addNew: function() {
-        this.hasFile = true;
+      waitNext: function() {
         this.$nextTick(() => {
             this.editor.editor.focus();
         });
+      },
+      clkCtx: function() {
+        let selected = this.editor.editor.getSelection();
+        if (! selected.isEmpty()) {
+            let selectedRange = this.editor.editor.getSelectionRange();
+            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+            this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
+        } else {
+            this.editor.editor.insert('**GRAS**');
+        }
+        this.waitNext();
+      },
+      addNew: function() {
+        this.hasFile = true;
+        this.waitNext();
       },
       editorInit: function (editor) {
           require('brace/ext/language_tools') //language extension prerequsite...
