@@ -39,11 +39,12 @@
                   <TabItem :active="true" :class="{hidden: !hasFile}">
                     Untitled
                   </TabItem>
-                  <TabItem :fixed="true" icon="plus" @click.native="hasFile=true">
+                  <TabItem :fixed="true" icon="plus" @click.native="addNew">
                   </TabItem>
                 </TabGroup>
                 <div class="expanded" :class="{hidden: !hasFile}" >
                   <editor
+                    ref="aceeditor"
                     v-model="content"
                     @init="editorInit"
                     lang="markdown"
@@ -78,17 +79,22 @@ export default {
   props: {
     msg: String
   },
-  data: () => ({
-    hasFile: false,
-    content: "",
-    selected: "sRendu",
-    shown: {
-      sidebar: false,
-      mainPane : true,
-      altPane: false
+  data() {
+    return {
+      hasFile: false,
+      content: "",
+      selected: "sRendu",
+      shown: {
+        sidebar: false,
+        mainPane : true,
+        altPane: false
+      }
     }
-  }),
+  },
   computed: {
+    editor: function() {
+      return this.$refs.aceeditor;
+    },
     mattered: function() {
       return matter(this.content);
     },
@@ -110,10 +116,22 @@ export default {
     }
   },
   methods: {
-      editorInit: function () {
+      addNew: function() {
+        this.hasFile = true;
+        this.$nextTick(() => {
+            this.editor.editor.focus();
+        });
+      },
+      editorInit: function (editor) {
           require('brace/ext/language_tools') //language extension prerequsite...
           require('brace/mode/markdown')    //language
           require('brace/theme/chrome')
+          editor.setWrapBehavioursEnabled(true);
+          editor.setShowInvisibles(true);
+          editor.setShowFoldWidgets(true);
+          editor.setShowPrintMargin(true);
+          editor.getSession().setUseWrapMode(true);
+          editor.getSession().setUseSoftTabs(true);
       }
   },
   components: {
