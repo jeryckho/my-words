@@ -1,6 +1,6 @@
 <template>
   <Window>
-    <Toolbar type="header" title="Header">
+    <Toolbar type="header" :title="Header">
       <ToolbarActions>
         <ButtonGroup class="pull-left">
           <Button size="sm" :active="!shown.sidebar" @click.native="shown.sidebar = !shown.sidebar">
@@ -36,8 +36,14 @@
             >
               <div id="mainPane" :class="{hidden: !shown.mainPane}">
                 <TabGroup>
-                  <TabItem :active="true" :class="{hidden: !hasFile}">
-                    Untitled
+                  <TabItem
+                    v-for="item in List"
+                    :key="item.ID"
+                    :active="item.ID == current"
+                    :class="{hidden: !hasFile}"
+                    @click.native="current=item.ID"
+                    @cancel="toClose(item.ID)">
+                    {{item.Title}}{{item.Changed?"*":""}}
                   </TabItem>
                   <TabItem :fixed="true" icon="plus" @click.native="addNew">
                   </TabItem>
@@ -74,6 +80,7 @@ import VueSplit from "./VueSplit.vue";
 import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
 import * as matter from 'gray-matter';
 import Marked from "marked"
+import nanoid from "nanoid"
 
 export default {
   name: "MainWindow",
@@ -82,8 +89,8 @@ export default {
   },
   data() {
     return {
-      hasFile: false,
-      content: "",
+      current: '',
+      List: {},
       selected: "sRendu",
       shown: {
         sidebar: false,
@@ -93,6 +100,26 @@ export default {
     }
   },
   computed: {
+    Header: function() {
+        if (this.current == '') return "/";
+        return this.List[this.current].Path;
+    },
+    hasFile: function() {
+      return (Object.keys(this.List).length !== 0)
+    },
+    content: {
+      get: function() {
+        if (this.current == '') return "";
+        return this.List[this.current].Content;
+      },
+      set: function(value) {
+        if (this.current != "") {
+          let tmp = this.List[this.current];
+          tmp.Content = value;
+          this.$set( this.List, this.current, tmp );
+        }
+      }
+    },
     editor: function() {
       return this.$refs.aceeditor;
     },
@@ -134,19 +161,39 @@ export default {
         this.waitNext();
       },
       addNew: function() {
-        this.hasFile = true;
+        var ID = nanoid();
+        this.$set( this.List, ID, {
+          ID: ID,
+          Title: "Untitled",
+          Path: "Untitled",
+          New: true,
+          Changed: true,
+          Content: ""
+        });
+        this.current = ID;
+        this.waitNext();
+      },
+      toClose: function(ID) {
+        let crt = "";
+        for(let item in this.List) {
+          if (item != ID ) {
+            crt = item;
+          }
+        }
+        this.current = crt;
+        this.$delete( this.List, ID );
         this.waitNext();
       },
       editorInit: function (editor) {
-          require('brace/ext/language_tools') //language extension prerequsite...
-          require('brace/mode/markdown')    //language
-          require('brace/theme/chrome')
-          editor.setWrapBehavioursEnabled(true);
-          editor.setShowInvisibles(true);
-          editor.setShowFoldWidgets(true);
-          editor.setShowPrintMargin(true);
-          editor.getSession().setUseWrapMode(true);
-          editor.getSession().setUseSoftTabs(true);
+        require('brace/ext/language_tools') //language extension prerequsite...
+        require('brace/mode/markdown')    //language
+        require('brace/theme/chrome')
+        editor.setWrapBehavioursEnabled(true);
+        editor.setShowInvisibles(true);
+        editor.setShowFoldWidgets(true);
+        editor.setShowPrintMargin(true);
+        editor.getSession().setUseWrapMode(true);
+        editor.getSession().setUseSoftTabs(true);
       }
   },
   components: {
