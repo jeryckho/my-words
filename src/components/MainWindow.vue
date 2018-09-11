@@ -1,6 +1,6 @@
 <template>
   <Window>
-    <Toolbar type="header" :title="Header">
+    <Toolbar type="header">
       <ToolbarActions>
         <ButtonGroup class="pull-left">
           <Button size="sm" :active="!shown.sidebar" @click.native="shown.sidebar = !shown.sidebar">
@@ -57,6 +57,7 @@
                     theme="chrome"
                     width="100%"
                     height="100%"
+                    @input="Changing"
                     @click.right.native="clkCtx"
                   >
                   </editor>
@@ -70,7 +71,7 @@
           </Pane>
         </PaneGroup>
       </WindowContent>
-    <Toolbar type="footer" title="Footer"></Toolbar>
+    <Toolbar type="footer" :title="Header"></Toolbar>
 </Window>
 </template>
 
@@ -81,6 +82,9 @@ import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, Button
 import * as matter from 'gray-matter';
 import Marked from "marked"
 import nanoid from "nanoid"
+import fs from "fs"
+import { remote } from "electron"
+const { getCurrentWindow, dialog, Menu } = remote
 
 export default {
   name: "MainWindow",
@@ -114,9 +118,7 @@ export default {
       },
       set: function(value) {
         if (this.current != "") {
-          let tmp = this.List[this.current];
-          tmp.Content = value;
-          this.$set( this.List, this.current, tmp );
+          this.SetLst( this.current, { Content: value } )
         }
       }
     },
@@ -144,61 +146,149 @@ export default {
     }
   },
   methods: {
-      waitNext: function() {
-        this.$nextTick(() => {
-            this.editor.editor.focus();
-        });
-      },
-      clkCtx: function() {
-        let selected = this.editor.editor.getSelection();
-        if (! selected.isEmpty()) {
-            let selectedRange = this.editor.editor.getSelectionRange();
-            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-            this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
-        } else {
-            this.editor.editor.insert('**GRAS**');
+    SetLst: function(ID, ext) {
+      this.$set( this.List, ID, Object.assign(this.List[ID] || {}, ext) );
+    },
+    Changing: function() {
+        if (this.current != "") {
+          this.SetLst(this.current, { Changed: true });
         }
-        this.waitNext();
-      },
-      addNew: function() {
-        var ID = nanoid();
-        this.$set( this.List, ID, {
-          ID: ID,
-          Title: "Untitled",
-          Path: "Untitled",
-          New: true,
-          Changed: true,
-          Content: ""
-        });
-        this.current = ID;
-        this.waitNext();
-      },
-      toClose: function(ID) {
-        let crt = "";
-        for(let item in this.List) {
-          if (item != ID ) {
-            crt = item;
-          }
-        }
-        this.current = crt;
-        this.$delete( this.List, ID );
-        this.waitNext();
-      },
-      editorInit: function (editor) {
-        require('brace/ext/language_tools') //language extension prerequsite...
-        require('brace/mode/markdown')    //language
-        require('brace/theme/chrome')
-        editor.setWrapBehavioursEnabled(true);
-        editor.setShowInvisibles(true);
-        editor.setShowFoldWidgets(true);
-        editor.setShowPrintMargin(true);
-        editor.getSession().setUseWrapMode(true);
-        editor.getSession().setUseSoftTabs(true);
+    },
+    waitNext: function() {
+      this.$nextTick(() => {
+          this.editor.editor.focus();
+      });
+    },
+    clkCtx: function() {
+      let selected = this.editor.editor.getSelection();
+      if (! selected.isEmpty()) {
+          let selectedRange = this.editor.editor.getSelectionRange();
+          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+          this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
+      } else {
+          this.editor.editor.insert('**GRAS**');
       }
+      this.waitNext();
+    },
+    addNew: function() {
+      var ID = nanoid();
+      this.SetLst( ID, {
+        ID: ID,
+        Title: "Untitled",
+        Path: "Untitled",
+        New: true,
+        Changed: true,
+        Content: ""
+      });
+      this.current = ID;
+      this.waitNext();
+    },
+    toClose: function(ID) {
+      let crt = "";
+      for(let item in this.List) {
+        if (item != ID ) {
+          crt = item;
+        }
+      }
+      this.current = crt;
+      this.$delete( this.List, ID );
+      this.waitNext();
+    },
+    toSave: function() {
+      var vm = this;
+      let Crt = vm.current;
+      if (Crt != "") {
+        let Item = vm.List[Crt];
+        if (Item.Changed) {
+          if (Item.New) {
+            var fileName = dialog.showSaveDialog(getCurrentWindow(), {
+              filters: [
+                { name: 'Markdown', extensions: ['md'] },
+                { name: 'All Files', extensions: ['*'] }
+              ]
+            });
+            if (typeof fileName !== 'undefined') {
+              // eslint-disable-next-line
+              fs.writeFile(fileName, Item.Content, function(err, data) {
+                vm.SetLst( Crt, { New: false, Changed: false, Title: fileName, Path: fileName })
+              });
+            }
+          } else {
+            // eslint-disable-next-line
+            fs.writeFile(Item.Path, Item.Content, function(err, data) {
+                vm.SetLst( Crt, { Changed: false })
+            });
+          }
+          vm.waitNext();
+        }
+      }
+    },
+    toLoad: function() {
+      var vm = this;
+      var fileNames = dialog.showOpenDialog(getCurrentWindow(), {
+        properties: [
+          'openFile'
+        ],
+        filters: [
+          { name: 'Markdown', extensions: ['md'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      });
+
+      if (fileNames !== undefined) {
+        var fileName = fileNames[0];
+        fs.readFile(fileName, 'utf8', function (err, data) {
+          var ID = fileName;
+          vm.SetLst( ID, {
+            ID: ID,
+            Title: ID,
+            Path: ID,
+            New: false,
+            Changed: false,
+            Content: data
+          });
+          vm.current = ID;
+          vm.$nextTick(() => {
+              vm.SetLst( ID, { Changed: false } )
+              vm.editor.editor.focus();
+          });
+        });
+      }
+    },
+    editorInit: function (editor) {
+      require('brace/ext/language_tools') //language extension prerequsite...
+      require('brace/mode/markdown')    //language
+      require('brace/theme/chrome')
+      editor.setWrapBehavioursEnabled(true);
+      editor.setShowInvisibles(true);
+      editor.setShowFoldWidgets(true);
+      editor.setShowPrintMargin(true);
+      editor.getSession().setUseWrapMode(true);
+      editor.getSession().setUseSoftTabs(true);
+    }
   },
   components: {
     VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem,
     editor: require('vue2-ace-editor')
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      const template = [
+        {
+          label: 'Fichier',
+            submenu: [
+              { label:'Nouveau Fichier', accelerator: 'CommandOrControl+N', click: this.addNew },
+              { label:'Ouvrir Fichier', accelerator: 'CommandOrControl+O', click: this.toLoad },
+              { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: this.toSave },
+              {type: 'separator'},
+              { label:'Quitter', role: 'quit'}
+          ]
+        }
+      ];
+
+      const menu = Menu.buildFromTemplate(template);
+      Menu.setApplicationMenu(menu);
+    })
   }
 }
 </script>
