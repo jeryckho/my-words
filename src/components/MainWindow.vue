@@ -3,14 +3,28 @@
     <Toolbar type="header">
       <ToolbarActions>
         <ButtonGroup class="pull-left">
-          <Button size="sm" :active="!shown.sidebar" @click.native="shown.sidebar = !shown.sidebar">
+          <Button size="sm" :active="!shown.sidebar" @click.native="Unshow('sidebar')">
             <Icon icon="folder"></Icon>
           </Button>
-          <Button size="sm" :active="!shown.mainPane" @click.native="shown.mainPane = !shown.mainPane">
+          <Button size="sm" :active="!shown.mainPane" @click.native="Unshow('mainPane')">
             <Icon icon="quote"></Icon>
           </Button>
-          <Button size="sm" :active="!shown.altPane" @click.native="shown.altPane = !shown.altPane">
+          <Button size="sm" :active="!shown.altPane" @click.native="Unshow('altPane')">
             <Icon icon="tools"></Icon>
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup class="pull-left" :class="{hidden: selEdit==''}">
+          <Button size="sm" :active="!config.showInvisibles" @click.native="Unconfig('showInvisibles')">
+            <Icon icon="block"></Icon>
+          </Button>
+          <Button size="sm" :active="!config.showFoldWidgets" @click.native="Unconfig('showFoldWidgets')">
+            <Icon icon="flow-cascade"></Icon>
+          </Button>
+          <Button size="sm" :active="!config.showPrintMargin" @click.native="Unconfig('showPrintMargin')">
+            <Icon icon="list"></Icon>
+          </Button>
+          <Button size="sm" :active="!config.useWrapMode" @click.native="Unconfig('useWrapMode')">
+            <Icon icon="level-down"></Icon>
           </Button>
         </ButtonGroup>
         <ButtonGroup class="pull-right" :class="{hidden: !shown.altPane}">
@@ -103,6 +117,12 @@ export default {
         sidebar: false,
         mainPane : true,
         altPane: false
+      },
+      config: {
+        showInvisibles: true,
+        showFoldWidgets: true,
+        showPrintMargin: true,
+        useWrapMode: true
       }
     }
   },
@@ -266,16 +286,31 @@ Avec espace : ${this.count.all}`;
         });
       }
     },
-    editorInit: function (editor) {
+    editorInit: function () {
       require('brace/ext/language_tools') //language extension prerequsite...
       require('brace/mode/markdown')    //language
       require('brace/theme/chrome')
+      this.Reconfig();
+    },
+    Unshow: function(show) {
+      this.shown[show] = !this.shown[show];
+      if (this.selEdit != "") {
+        this.waitNext();
+      }
+    },
+    Unconfig: function(conf) {
+      this.config[conf] = !this.config[conf];
+      this.Reconfig();
+    },
+    Reconfig: function() {
+      let editor = this.editor.editor;
       editor.setWrapBehavioursEnabled(true);
-      editor.setShowInvisibles(true);
-      editor.setShowFoldWidgets(true);
-      editor.setShowPrintMargin(true);
-      editor.getSession().setUseWrapMode(true);
+      editor.setShowInvisibles(this.config.showInvisibles);
+      editor.setShowFoldWidgets(this.config.showFoldWidgets);
+      editor.setShowPrintMargin(this.config.showPrintMargin);
+      editor.getSession().setUseWrapMode(this.config.useWrapMode);
       editor.getSession().setUseSoftTabs(true);
+      this.waitNext();
     }
   },
 

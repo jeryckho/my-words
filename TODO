@@ -3,7 +3,7 @@
 [X] Calcul du BaseName
 [] Objectif
 [X] Menu Complet
-[] Config Editor
+[X] Config Editor
 [] Menu contextuel
 [] Shell to Wikipedia / Synonyme / Conjugueur
 [] Spell Check / Grammalecte
@@ -11,3 +11,4 @@
 [] Alternative MD (dans altPane)
 [] GDrive
 [] Bug splitView <=> Resize
+[] Save Config
