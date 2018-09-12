@@ -57,7 +57,6 @@
                     theme="chrome"
                     width="100%"
                     height="100%"
-                    @input="Changing"
                     @click.right.native="clkCtx"
                   >
                   </editor>
@@ -117,8 +116,11 @@ export default {
         return this.List[this.current].Content;
       },
       set: function(value) {
-        if (this.current != "") {
-          this.SetLst( this.current, { Content: value } )
+        let Crt = this.current;
+        if ( Crt != "") {
+          const org = this.List[Crt].Content;
+          const stat = this.List[Crt].Changed;
+          this.SetLst( Crt, { Content: value, Changed: stat||(value !== org)  } )
         }
       }
     },
@@ -148,11 +150,6 @@ export default {
   methods: {
     SetLst: function(ID, ext) {
       this.$set( this.List, ID, Object.assign(this.List[ID] || {}, ext) );
-    },
-    Changing: function() {
-        if (this.current != "") {
-          this.SetLst(this.current, { Changed: true });
-        }
     },
     waitNext: function() {
       this.$nextTick(() => {
@@ -249,7 +246,7 @@ export default {
           });
           vm.current = ID;
           vm.$nextTick(() => {
-              vm.SetLst( ID, { Changed: false } )
+              // vm.SetLst( ID, { Changed: false } )
               vm.editor.editor.focus();
           });
         });
