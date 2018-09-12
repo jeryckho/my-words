@@ -57,7 +57,7 @@
                   :active="item.ID==selEdit"
                   :class="{hidden: !hasFile}"
                   :title="item.Path"
-                  @click.native="selEdit=item.ID"
+                  @click.native="Select(item.ID)"
                   @cancel="toClose(item.ID)">
                   {{item.Title}}{{item.Changed?"*":""}}
                 </TabItem>
@@ -291,6 +291,10 @@ Avec espace : ${this.count.all}`;
       require('brace/mode/markdown')    //language
       require('brace/theme/chrome')
       this.Reconfig();
+    },
+    Select: function(id) {
+      this.selEdit = id;
+      this.waitNext();
     },
     Unshow: function(show) {
       this.shown[show] = !this.shown[show];
