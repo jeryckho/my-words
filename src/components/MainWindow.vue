@@ -14,64 +14,62 @@
           </Button>
         </ButtonGroup>
         <ButtonGroup class="pull-right"  :class="{hidden: !shown.altPane}">
-          <Button size="sm" :active="selected=='sRendu'" @click.native="selected='sRendu'">
+          <Button size="sm" :active="selAlt=='sRendu'" @click.native="selAlt='sRendu'">
             <Icon icon="doc-text"></Icon>
           </Button>
-          <Button size="sm" :active="selected=='sFront'" @click.native="selected='sFront'">
+          <Button size="sm" :active="selAlt=='sFront'" @click.native="selAlt='sFront'">
             <Icon icon="info"></Icon>
           </Button>
         </ButtonGroup>
       </ToolbarActions>
     </Toolbar>
     <WindowContent>
-        <PaneGroup>
-          <Pane size="mini" :sidebar="true" :class="{hidden: !shown.sidebar}">sidebar</Pane>
-          <Pane>
-            <VueSplit
-              :elements="panes"
-              direction="horizontal"
-              :min-size="100"
-              :gutter-size="10"
-              :snap-offset="50"
-            >
-              <div id="mainPane" :class="{hidden: !shown.mainPane}">
-                <TabGroup>
-                  <TabItem
-                    v-for="item in List"
-                    :key="item.ID"
-                    :active="item.ID == current"
-                    :class="{hidden: !hasFile}"
-                    @click.native="current=item.ID"
-                    @cancel="toClose(item.ID)">
-                    {{item.Title}}{{item.Changed?"*":""}}
-                  </TabItem>
-                  <TabItem :fixed="true" icon="plus" @click.native="addNew">
-                  </TabItem>
-                </TabGroup>
-                <div class="expanded" :class="{hidden: !hasFile}" >
-                  <editor
-                    ref="aceeditor"
-                    v-model="content"
-                    @init="editorInit"
-                    lang="markdown"
-                    theme="chrome"
-                    width="100%"
-                    height="100%"
-                    @click.right.native="clkCtx"
-                  >
-                  </editor>
-                </div>
+      <PaneGroup>
+        <Pane size="mini" :sidebar="true" :class="{hidden: !shown.sidebar}">sidebar</Pane>
+        <Pane>
+          <VueSplit
+            :elements="panes"
+            direction="horizontal"
+            :min-size="100"
+            :gutter-size="10"
+            :snap-offset="50"
+          >
+            <div id="mainPane" :class="{hidden: !shown.mainPane}">
+              <TabGroup>
+                <TabItem
+                  v-for="item in Editors"
+                  :key="item.ID"
+                  :active="item.ID==selEdit"
+                  :class="{hidden: !hasFile}"
+                  @click.native="selEdit=item.ID"
+                  @cancel="toClose(item.ID)">
+                  {{item.Title}}{{item.Changed?"*":""}}
+                </TabItem>
+                <TabItem :fixed="true" icon="plus" @click.native="addNew">
+                </TabItem>
+              </TabGroup>
+              <div class="expanded" :class="{hidden: !hasFile}" >
+                <editor
+                  ref="aceeditor"
+                  v-model="content"
+                  @init="editorInit"
+                  lang="markdown"
+                  theme="chrome"
+                  @click.right.native="clkCtx"
+                >
+                </editor>
               </div>
-              <div id="altPane" :class="{hidden: !shown.altPane}" style="overflow-y:auto;">
-                <div v-html="marked" :class="{hidden: selected != 'sRendu'}"></div>
-                <div v-html="jshtm" :class="{hidden: selected != 'sFront'}"></div>
-              </div>
-            </VueSplit>
-          </Pane>
-        </PaneGroup>
-      </WindowContent>
-    <Toolbar type="footer" :title="Header"></Toolbar>
-</Window>
+            </div>
+            <div id="altPane" :class="{hidden: !shown.altPane}" style="overflow-y:auto;">
+              <div v-html="marked" :class="{hidden: selAlt != 'sRendu'}"></div>
+              <div v-html="jshtm" :class="{hidden: selAlt != 'sFront'}"></div>
+            </div>
+          </VueSplit>
+        </Pane>
+      </PaneGroup>
+    </WindowContent>
+    <Toolbar type="footer">{{Footer}}</Toolbar>
+  </Window>
 </template>
 
 <script>
@@ -92,9 +90,9 @@ export default {
   },
   data() {
     return {
-      current: '',
-      List: {},
-      selected: "sRendu",
+      selEdit: '',
+      Editors: {},
+      selAlt: "sRendu",
       shown: {
         sidebar: false,
         mainPane : true,
@@ -103,24 +101,24 @@ export default {
     }
   },
   computed: {
-    Header: function() {
-        if (this.current == '') return "/";
-        return this.List[this.current].Path;
+    Footer: function() {
+        if (this.selEdit == '') return "/";
+        return this.Editors[this.selEdit].Path;
     },
     hasFile: function() {
-      return (Object.keys(this.List).length !== 0)
+      return (Object.keys(this.Editors).length !== 0)
     },
     content: {
       get: function() {
-        if (this.current == '') return "";
-        return this.List[this.current].Content;
+        if (this.selEdit == '') return "";
+        return this.Editors[this.selEdit].Content;
       },
       set: function(value) {
-        let Crt = this.current;
-        if ( Crt != "") {
-          const org = this.List[Crt].Content;
-          const stat = this.List[Crt].Changed;
-          this.SetLst( Crt, { Content: value, Changed: stat||(value !== org)  } )
+        let Sel = this.selEdit;
+        if ( Sel != "") {
+          const org = this.Editors[Sel].Content;
+          const stat = this.Editors[Sel].Changed;
+          this.SetEdit( Sel, { Content: value, Changed: stat||(value !== org)  } )
         }
       }
     },
@@ -148,8 +146,8 @@ export default {
     }
   },
   methods: {
-    SetLst: function(ID, ext) {
-      this.$set( this.List, ID, Object.assign(this.List[ID] || {}, ext) );
+    SetEdit: function(ID, ext) {
+      this.$set( this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext) );
     },
     waitNext: function() {
       this.$nextTick(() => {
@@ -157,8 +155,8 @@ export default {
       });
     },
     clkCtx: function() {
-      let selected = this.editor.editor.getSelection();
-      if (! selected.isEmpty()) {
+      let selAlt = this.editor.editor.getSelection();
+      if (! selAlt.isEmpty()) {
           let selectedRange = this.editor.editor.getSelectionRange();
           let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
           this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
@@ -169,7 +167,7 @@ export default {
     },
     addNew: function() {
       var ID = nanoid();
-      this.SetLst( ID, {
+      this.SetEdit( ID, {
         ID: ID,
         Title: "Untitled",
         Path: "Untitled",
@@ -177,25 +175,25 @@ export default {
         Changed: true,
         Content: ""
       });
-      this.current = ID;
+      this.selEdit = ID;
       this.waitNext();
     },
     toClose: function(ID) {
-      let crt = "";
-      for(let item in this.List) {
+      let Sel = "";
+      for(let item in this.Editors) {
         if (item != ID ) {
-          crt = item;
+          Sel = item;
         }
       }
-      this.current = crt;
-      this.$delete( this.List, ID );
+      this.selEdit = Sel;
+      this.$delete( this.Editors, ID );
       this.waitNext();
     },
     toSave: function() {
       var vm = this;
-      let Crt = vm.current;
-      if (Crt != "") {
-        let Item = vm.List[Crt];
+      let Sel = vm.selEdit;
+      if (Sel != "") {
+        let Item = vm.Editors[Sel];
         if (Item.Changed) {
           if (Item.New) {
             var fileName = dialog.showSaveDialog(getCurrentWindow(), {
@@ -207,13 +205,13 @@ export default {
             if (typeof fileName !== 'undefined') {
               // eslint-disable-next-line
               fs.writeFile(fileName, Item.Content, function(err, data) {
-                vm.SetLst( Crt, { New: false, Changed: false, Title: fileName, Path: fileName })
+                vm.SetEdit( Sel, { New: false, Changed: false, Title: fileName, Path: fileName })
               });
             }
           } else {
             // eslint-disable-next-line
             fs.writeFile(Item.Path, Item.Content, function(err, data) {
-                vm.SetLst( Crt, { Changed: false })
+                vm.SetEdit( Sel, { Changed: false })
             });
           }
           vm.waitNext();
@@ -236,7 +234,7 @@ export default {
         var fileName = fileNames[0];
         fs.readFile(fileName, 'utf8', function (err, data) {
           var ID = fileName;
-          vm.SetLst( ID, {
+          vm.SetEdit( ID, {
             ID: ID,
             Title: ID,
             Path: ID,
@@ -244,11 +242,8 @@ export default {
             Changed: false,
             Content: data
           });
-          vm.current = ID;
-          vm.$nextTick(() => {
-              // vm.SetLst( ID, { Changed: false } )
-              vm.editor.editor.focus();
-          });
+          vm.selEdit = ID;
+          vm.waitNext();
         });
       }
     },
@@ -297,6 +292,6 @@ export default {
 }
 .expanded {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 22px) !important;
 }
 </style>
