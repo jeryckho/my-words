@@ -13,7 +13,7 @@
             <Icon icon="tools"></Icon>
           </Button>
         </ButtonGroup>
-        <ButtonGroup class="pull-right"  :class="{hidden: !shown.altPane}">
+        <ButtonGroup class="pull-right" :class="{hidden: !shown.altPane}">
           <Button size="sm" :active="selAlt=='sRendu'" @click.native="selAlt='sRendu'">
             <Icon icon="doc-text"></Icon>
           </Button>
@@ -38,6 +38,7 @@
               <TabGroup>
                 <TabItem
                   v-for="item in Editors"
+                  class="stayFit"
                   :key="item.ID"
                   :active="item.ID==selEdit"
                   :class="{hidden: !hasFile}"
@@ -68,7 +69,7 @@
         </Pane>
       </PaneGroup>
     </WindowContent>
-    <Toolbar type="footer">{{Footer}}</Toolbar>
+    <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span class="FFile stayFit pull-right">{{count.words}} mots</span></Toolbar>
   </Window>
 </template>
 
@@ -80,6 +81,7 @@ import * as matter from 'gray-matter';
 import Marked from "marked"
 import nanoid from "nanoid"
 import fs from "fs"
+import Countable from "countable"
 import { remote } from "electron"
 const { getCurrentWindow, dialog, Menu } = remote
 
@@ -130,6 +132,10 @@ export default {
     },
     marked: function () {
       return Marked(this.mattered.content);
+    },
+    count: function () {
+      let s = this.mattered.content;
+      return Countable.countString(s);
     },
     jshtm: function () {
       return jthf.getForm(this.mattered.data);
@@ -292,6 +298,15 @@ export default {
 }
 .expanded {
   width: 100%;
-  height: calc(100% - 22px) !important;
+  height: calc(100% - 25px) !important;
+}
+.stayFit {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.FFile {
+  max-width:50%;
+  display:inline-block
 }
 </style>

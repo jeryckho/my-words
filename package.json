@@ -20,6 +20,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "countable": "git+https://git@github.com/jeryckho/Countable.git",
     "gray-matter": "^4.0.1",
     "json-to-html-form": "^1.7.0",
     "marked": "^0.5.0",
