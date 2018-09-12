@@ -82,14 +82,17 @@ import Marked from "marked"
 import nanoid from "nanoid"
 import fs from "fs"
 import Countable from "countable"
+import * as path from 'path'
 import { remote } from "electron"
-const { getCurrentWindow, dialog, Menu } = remote
+const { getCurrentWindow, dialog, Menu, shell } = remote
 
 export default {
   name: "MainWindow",
+
   props: {
     msg: String
   },
+
   data() {
     return {
       selEdit: '',
@@ -102,6 +105,7 @@ export default {
       }
     }
   },
+
   computed: {
     Footer: function() {
         if (this.selEdit == '') return "/";
@@ -151,6 +155,7 @@ export default {
       return res;
     }
   },
+
   methods: {
     SetEdit: function(ID, ext) {
       this.$set( this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext) );
@@ -211,7 +216,7 @@ export default {
             if (typeof fileName !== 'undefined') {
               // eslint-disable-next-line
               fs.writeFile(fileName, Item.Content, function(err, data) {
-                vm.SetEdit( Sel, { New: false, Changed: false, Title: fileName, Path: fileName })
+                vm.SetEdit( Sel, { New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
               });
             }
           } else {
@@ -242,7 +247,7 @@ export default {
           var ID = fileName;
           vm.SetEdit( ID, {
             ID: ID,
-            Title: ID,
+            Title: path.basename(ID),
             Path: ID,
             New: false,
             Changed: false,
@@ -265,10 +270,12 @@ export default {
       editor.getSession().setUseSoftTabs(true);
     }
   },
+
   components: {
     VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem,
     editor: require('vue2-ace-editor')
   },
+
   mounted: function () {
     this.$nextTick(function () {
       const template = [
@@ -280,6 +287,47 @@ export default {
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: this.toSave },
               {type: 'separator'},
               { label:'Quitter', role: 'quit'}
+          ]
+        },
+        {
+          label: 'Modifier',
+          submenu: [
+            {label:'Annuler', role: 'undo'},
+            {label:'Rétablir', role: 'redo'},
+            {type: 'separator'},
+            {label:'Couper', role: 'cut'},
+            {label:'Copier', role: 'copy'},
+            {label:'Coller', role: 'paste'},
+            {type: 'separator'},
+            {label:'Supprimer', role: 'delete'},
+            {label:'Tout sélectionner', role: 'selectall'}
+          ]
+        },
+        {
+          label: 'Afficher',
+          submenu: [
+            {label:'Zoomer', role: 'zoomin'},
+            {label:'Dé-zoomer', role: 'zoomout'},
+            {label:'Zoom initial', role: 'resetzoom'},
+            {type: 'separator'},
+            {label:'Plein écran', role: 'togglefullscreen'}
+          ]
+        },
+        {
+          label: 'Fenêtre',
+          submenu: [
+            {label:'Réduire', role: 'minimize'},
+            {label:'Fermer', role: 'close'}
+          ]
+        },
+        {
+          label: "Aide",
+          role: 'help',
+          submenu: [
+            {
+              label: 'Sources',
+              click () { shell.openExternal('https://github.com/jeryckho/my-words') }
+            }
           ]
         }
       ];

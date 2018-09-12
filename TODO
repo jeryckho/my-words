@@ -1,8 +1,8 @@
 [X] Span dans footer
 [X] Compte des mots
-[] Calcul du BaseName
+[X] Calcul du BaseName
 [] Objectif
-[] Menu Complet
+[X] Menu Complet
 [] Config Editor
 [] Menu contextuel
 [] Shell to Wikipedia / Synonyme / Conjugueur
@@ -10,3 +10,4 @@
 [] SideBar
 [] Alternative MD (dans altPane)
 [] GDrive
+[] Bug splitView <=> Resize
