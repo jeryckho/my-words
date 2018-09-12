@@ -42,6 +42,7 @@
                   :key="item.ID"
                   :active="item.ID==selEdit"
                   :class="{hidden: !hasFile}"
+                  :title="item.Path"
                   @click.native="selEdit=item.ID"
                   @cancel="toClose(item.ID)">
                   {{item.Title}}{{item.Changed?"*":""}}
@@ -69,7 +70,7 @@
         </Pane>
       </PaneGroup>
     </WindowContent>
-    <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span class="FFile stayFit pull-right">{{count.words}} mots</span></Toolbar>
+    <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span :title="showCount" class="FFile stayFit pull-right">{{count.words}} mots</span></Toolbar>
   </Window>
 </template>
 
@@ -140,6 +141,13 @@ export default {
     count: function () {
       let s = this.mattered.content;
       return Countable.countString(s);
+    },
+    showCount: function() {
+      return `Paragraphes : ${this.count.paragraphs}
+Phrases : ${this.count.sentences}
+Mots : ${this.count.words}
+Lettres : ${this.count.characters}
+Avec espace : ${this.count.all}`;
     },
     jshtm: function () {
       return jthf.getForm(this.mattered.data);
