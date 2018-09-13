@@ -85,7 +85,7 @@
         </Pane>
       </PaneGroup>
     </WindowContent>
-    <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span :title="showCount" class="FFile stayFit pull-right">{{count.words}} mots</span></Toolbar>
+    <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span :title="showCount" class="Details stayFit pull-right">{{count.words}} mots</span><span v-if="'objectif' in mattered.data" class="Details stayFit pull-right">{{objectif}}</span></Toolbar>
   </Window>
 </template>
 
@@ -159,6 +159,17 @@ export default {
     },
     marked: function () {
       return Marked(this.mattered.content);
+    },
+    objectif: function() {
+      if ('objectif' in this.mattered.data) {
+        let n = this.mattered.data.objectif;
+        let w = this.count.words;
+        if (!isNaN(parseFloat(n)) && isFinite(n)) {
+          if (n == 0) return '';
+          return `${Math.round(1000*w / n)/10} %`;
+        }
+      }
+      return ''
     },
     count: function () {
       let s = this.mattered.content;
@@ -316,7 +327,7 @@ Avec espace : ${this.count.all}`;
             Content: data
           });
           vm.selEdit = ID;
-          vm.waitNext();
+          vm.Resize();
         });
       }
     },
@@ -328,12 +339,12 @@ Avec espace : ${this.count.all}`;
     },
     Select: function(id) {
       this.selEdit = id;
-      this.waitNext();
+      this.Resize();
     },
     Unshow: function(show) {
       this.shown[show] = !this.shown[show];
       if (this.selEdit != "") {
-        this.waitNext();
+        this.Resize();
       }
     },
     Unconfig: function(conf) {
@@ -447,6 +458,11 @@ Avec espace : ${this.count.all}`;
 }
 .FFile {
   max-width:50%;
+  display:inline-block
+}
+.Details {
+  max-width:24%;
+  padding-left: 15px;
   display:inline-block
 }
 </style>

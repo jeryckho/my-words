@@ -1,7 +1,7 @@
 [X] Span dans footer
 [X] Compte des mots
 [X] Calcul du BaseName
-[] Objectif
+[X] Objectif
 [X] Menu Complet
 [X] Config Editor
 [X] Menu contextuel
@@ -13,3 +13,4 @@
 [X] Bug splitView <=> Resize
 [] Save Config
 [] Shell selon settings
+[] Bug Changed
