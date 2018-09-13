@@ -99,7 +99,7 @@ import fs from "fs"
 import Countable from "countable"
 import * as path from 'path'
 import { remote } from "electron"
-const { getCurrentWindow, dialog, Menu, shell } = remote
+const { getCurrentWindow, dialog, Menu, MenuItem, shell } = remote
 
 export default {
   name: "MainWindow",
@@ -118,6 +118,7 @@ export default {
         mainPane : true,
         altPane: false
       },
+      CtxMenu: {},
       config: {
         showInvisibles: true,
         showFoldWidgets: true,
@@ -193,7 +194,7 @@ Avec espace : ${this.count.all}`;
           this.editor.editor.focus();
       });
     },
-    clkCtx: function() {
+    makeBold: function() {
       let selAlt = this.editor.editor.getSelection();
       if (! selAlt.isEmpty()) {
           let selectedRange = this.editor.editor.getSelectionRange();
@@ -202,6 +203,32 @@ Avec espace : ${this.count.all}`;
       } else {
           this.editor.editor.insert('**GRAS**');
       }
+      this.waitNext();
+    },
+    makeItal: function() {
+      let selAlt = this.editor.editor.getSelection();
+      if (! selAlt.isEmpty()) {
+          let selectedRange = this.editor.editor.getSelectionRange();
+          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+          this.editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
+      } else {
+          this.editor.editor.insert('*_ITAL_');
+      }
+      this.waitNext();
+    },
+    shellGo: function(empty,full) {
+      let selAlt = this.editor.editor.getSelection();
+      if (! selAlt.isEmpty()) {
+        let selectedRange = this.editor.editor.getSelectionRange();
+        let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+        shell.openExternal(full + selectedText);
+      } else {
+        shell.openExternal(empty)
+      }
+      this.waitNext();
+    },
+    clkCtx: function() {
+      this.CtxMenu.popup({window: getCurrentWindow()})
       this.waitNext();
     },
     addNew: function() {
@@ -324,20 +351,22 @@ Avec espace : ${this.count.all}`;
   },
 
   mounted: function () {
-    this.$nextTick(function () {
+    var vm = this;
+    vm.$nextTick(function () {
       const template = [
         {
           label: 'Fichier',
             submenu: [
-              { label:'Nouveau Fichier', accelerator: 'CommandOrControl+N', click: this.addNew },
-              { label:'Ouvrir Fichier', accelerator: 'CommandOrControl+O', click: this.toLoad },
-              { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: this.toSave },
+              { label:'Nouveau Fichier', accelerator: 'CommandOrControl+N', click: vm.addNew },
+              { label:'Ouvrir Fichier', accelerator: 'CommandOrControl+O', click: vm.toLoad },
+              { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
               {type: 'separator'},
               { label:'Quitter', role: 'quit'}
           ]
         },
         {
           label: 'Modifier',
+          role: 'editMenu',
           submenu: [
             {label:'Annuler', role: 'undo'},
             {label:'Rétablir', role: 'redo'},
@@ -362,6 +391,7 @@ Avec espace : ${this.count.all}`;
         },
         {
           label: 'Fenêtre',
+          role: 'windowMenu',
           submenu: [
             {label:'Réduire', role: 'minimize'},
             {label:'Fermer', role: 'close'}
@@ -381,6 +411,14 @@ Avec espace : ${this.count.all}`;
 
       const menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(menu);
+
+      vm.CtxMenu = new Menu();
+      vm.CtxMenu.append(new MenuItem({label: 'Gras', click: vm.makeBold }))
+      vm.CtxMenu.append(new MenuItem({label: 'Italique', click: vm.makeItal }))
+      vm.CtxMenu.append(new MenuItem({type: 'separator'}))
+      vm.CtxMenu.append(new MenuItem({label: 'Wikipedia', click() { vm.shellGo('https://fr.wikipedia.org','https://fr.wikipedia.org/wiki/') } }))
+      vm.CtxMenu.append(new MenuItem({label: 'Le Conjugueur', click() { vm.shellGo('https://leconjugueur.lefigaro.fr','https://leconjugueur.lefigaro.fr/conjugaison/verbe/') } }))
+      vm.CtxMenu.append(new MenuItem({label: 'Synonymes', click() { vm.shellGo('http://www.synonymes.com/','http://www.synonymes.com/synonyme.php?mot=') } }))
     })
   }
 }

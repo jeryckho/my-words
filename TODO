@@ -4,11 +4,12 @@
 [] Objectif
 [X] Menu Complet
 [X] Config Editor
-[] Menu contextuel
-[] Shell to Wikipedia / Synonyme / Conjugueur
+[X] Menu contextuel
+[X] Shell to Wikipedia / Synonyme / Conjugueur
 [] Spell Check / Grammalecte
 [] SideBar
 [] Alternative MD (dans altPane)
 [] GDrive
 [] Bug splitView <=> Resize
 [] Save Config
+[] Shell selon settings
