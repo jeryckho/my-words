@@ -112,6 +112,7 @@ export default {
   data() {
     return {
       selEdit: '',
+      precEdit: '',
       Editors: {},
       selAlt: "sRendu",
       shown: {
@@ -142,12 +143,14 @@ export default {
         if (this.selEdit == '') return "";
         return this.Editors[this.selEdit].Content;
       },
-      set: function(value) {
+      set: function(Content) {
         let Sel = this.selEdit;
+        let Prc = this.precEdit;
         if ( Sel != "") {
           const org = this.Editors[Sel].Content;
           const stat = this.Editors[Sel].Changed;
-          this.SetEdit( Sel, { Content: value, Changed: stat||(value !== org)  } )
+          const Changed = stat || ( (Prc == Sel) && ( value !== org ) );
+          this.SetEdit( Sel, { Content, Changed } );
         }
       }
     },
@@ -206,10 +209,13 @@ Avec espace : ${this.count.all}`;
           this.editor.editor.focus();
       });
     },
-    Resize: function() {
+    Resize: function(cb) {
       this.$nextTick(() => {
         this.editor.editor.resize();
         this.editor.editor.focus();
+        if (cb) {
+          cb();
+        }
       })
     },
     makeBold: function() {
@@ -250,8 +256,9 @@ Avec espace : ${this.count.all}`;
       this.waitNext();
     },
     addNew: function() {
+      let vm = this;
       var ID = nanoid();
-      this.SetEdit( ID, {
+      vm.SetEdit( ID, {
         ID: ID,
         Title: "Untitled",
         Path: "Untitled",
@@ -259,19 +266,20 @@ Avec espace : ${this.count.all}`;
         Changed: true,
         Content: ""
       });
-      this.selEdit = ID;
-      this.waitNext();
+      vm.selEdit = ID;
+      vm.Resize( () => { vm.precEdit = ID })
     },
     toClose: function(ID) {
+      let vm = this;
       let Sel = "";
-      for(let item in this.Editors) {
+      for(let item in vm.Editors) {
         if (item != ID ) {
           Sel = item;
         }
       }
-      this.selEdit = Sel;
-      this.$delete( this.Editors, ID );
-      this.waitNext();
+      vm.selEdit = Sel;
+      vm.$delete( vm.Editors, ID );
+      vm.Resize( () => { vm.precEdit = Sel })
     },
     toSave: function() {
       var vm = this;
@@ -327,7 +335,7 @@ Avec espace : ${this.count.all}`;
             Content: data
           });
           vm.selEdit = ID;
-          vm.Resize();
+          vm.Resize( () => { vm.precEdit = ID })
         });
       }
     },
@@ -338,8 +346,9 @@ Avec espace : ${this.count.all}`;
       this.Reconfig();
     },
     Select: function(id) {
-      this.selEdit = id;
-      this.Resize();
+      let vm = this;
+      vm.selEdit = id;
+      vm.Resize( () => { vm.precEdit = id })
     },
     SelAlt: function(sel) {
       this.selAlt = sel;
