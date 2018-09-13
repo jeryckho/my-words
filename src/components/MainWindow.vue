@@ -47,6 +47,7 @@
             :min-size="100"
             :gutter-size="10"
             :snap-offset="50"
+            @onDragEnd="Resize()"
           >
             <div id="mainPane" :class="{hidden: !shown.mainPane}">
               <TabGroup>
@@ -193,6 +194,12 @@ Avec espace : ${this.count.all}`;
       this.$nextTick(() => {
           this.editor.editor.focus();
       });
+    },
+    Resize: function() {
+      this.$nextTick(() => {
+        this.editor.editor.resize();
+        this.editor.editor.focus();
+      })
     },
     makeBold: function() {
       let selAlt = this.editor.editor.getSelection();

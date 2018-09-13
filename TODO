@@ -10,6 +10,6 @@
 [] SideBar
 [] Alternative MD (dans altPane)
 [] GDrive
-[] Bug splitView <=> Resize
+[X] Bug splitView <=> Resize
 [] Save Config
 [] Shell selon settings
