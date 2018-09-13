@@ -28,10 +28,10 @@
           </Button>
         </ButtonGroup>
         <ButtonGroup class="pull-right" :class="{hidden: !shown.altPane}">
-          <Button size="sm" :active="selAlt=='sRendu'" @click.native="selAlt='sRendu'">
+          <Button size="sm" :active="selAlt=='sRendu'" @click.native="SelAlt('sRendu')">
             <Icon icon="doc-text"></Icon>
           </Button>
-          <Button size="sm" :active="selAlt=='sFront'" @click.native="selAlt='sFront'">
+          <Button size="sm" :active="selAlt=='sFront'" @click.native="SelAlt('sFront')">
             <Icon icon="info"></Icon>
           </Button>
         </ButtonGroup>
@@ -78,8 +78,8 @@
               </div>
             </div>
             <div id="altPane" :class="{hidden: !shown.altPane}" style="overflow-y:auto;">
-              <div v-html="marked" :class="{hidden: selAlt != 'sRendu'}"></div>
-              <div v-html="jshtm" :class="{hidden: selAlt != 'sFront'}"></div>
+              <div v-if="selEdit != ''" v-html="marked" :class="{hidden: selAlt != 'sRendu'}"></div>
+              <div v-if="selEdit != ''" v-html="jshtm" :class="{hidden: selAlt != 'sFront'}"></div>
             </div>
           </VueSplit>
         </Pane>
@@ -213,8 +213,8 @@ Avec espace : ${this.count.all}`;
       })
     },
     makeBold: function() {
-      let selAlt = this.editor.editor.getSelection();
-      if (! selAlt.isEmpty()) {
+      let selection = this.editor.editor.getSelection();
+      if (! selection.isEmpty()) {
           let selectedRange = this.editor.editor.getSelectionRange();
           let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
           this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
@@ -224,8 +224,8 @@ Avec espace : ${this.count.all}`;
       this.waitNext();
     },
     makeItal: function() {
-      let selAlt = this.editor.editor.getSelection();
-      if (! selAlt.isEmpty()) {
+      let selection = this.editor.editor.getSelection();
+      if (! selection.isEmpty()) {
           let selectedRange = this.editor.editor.getSelectionRange();
           let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
           this.editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
@@ -235,8 +235,8 @@ Avec espace : ${this.count.all}`;
       this.waitNext();
     },
     shellGo: function(empty,full) {
-      let selAlt = this.editor.editor.getSelection();
-      if (! selAlt.isEmpty()) {
+      let selection = this.editor.editor.getSelection();
+      if (! selection.isEmpty()) {
         let selectedRange = this.editor.editor.getSelectionRange();
         let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
         shell.openExternal(full + selectedText);
@@ -341,14 +341,21 @@ Avec espace : ${this.count.all}`;
       this.selEdit = id;
       this.Resize();
     },
+    SelAlt: function(sel) {
+      this.selAlt = sel;
+      window.localStorage.setItem('SelAlt', sel);
+      this.Resize();
+    },
     Unshow: function(show) {
       this.shown[show] = !this.shown[show];
+      window.localStorage.setItem('Shown', JSON.stringify(this.shown));
       if (this.selEdit != "") {
         this.Resize();
       }
     },
     Unconfig: function(conf) {
       this.config[conf] = !this.config[conf];
+      window.localStorage.setItem('Config', JSON.stringify(this.config));
       this.Reconfig();
     },
     Reconfig: function() {
@@ -370,6 +377,20 @@ Avec espace : ${this.count.all}`;
 
   mounted: function () {
     var vm = this;
+
+    var StoredShown = window.localStorage.getItem('Shown');
+    if (StoredShown != null) {
+      vm.shown = Object.assign(vm.shown, JSON.parse(StoredShown))
+    }
+    var StoredConfig = window.localStorage.getItem('Config');
+    if (StoredConfig != null) {
+      vm.config = Object.assign(vm.config, JSON.parse(StoredConfig))
+    }
+    var StoredAlt = window.localStorage.getItem('SelAlt');
+    if (StoredAlt != null) {
+      vm.selAlt = StoredAlt;
+    }
+
     vm.$nextTick(function () {
       const template = [
         {
