@@ -149,7 +149,7 @@ export default {
         if ( Sel != "") {
           const org = this.Editors[Sel].Content;
           const stat = this.Editors[Sel].Changed;
-          const Changed = stat || ( (Prc == Sel) && ( value !== org ) );
+          const Changed = stat || ( (Prc == Sel) && ( Content !== org ) );
           this.SetEdit( Sel, { Content, Changed } );
         }
       }
