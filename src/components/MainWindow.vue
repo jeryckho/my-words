@@ -101,6 +101,7 @@ import Countable from "countable"
 import * as path from 'path'
 import { remote } from "electron"
 const { getCurrentWindow, dialog, Menu, MenuItem, shell } = remote
+require('electron-disable-file-drop');
 
 export default {
   name: "MainWindow",
