@@ -394,6 +394,7 @@ Avec espace : ${this.count.all}`;
     var StoredConfig = window.localStorage.getItem('Config');
     if (StoredConfig != null) {
       vm.config = Object.assign(vm.config, JSON.parse(StoredConfig))
+      vm.Reconfig();
     }
     var StoredAlt = window.localStorage.getItem('SelAlt');
     if (StoredAlt != null) {
