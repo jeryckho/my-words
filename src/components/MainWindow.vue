@@ -86,6 +86,7 @@
       </PaneGroup>
     </WindowContent>
     <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span :title="showCount" class="Details stayFit pull-right">{{count.words}} mots</span><span v-if="'objectif' in mattered.data" class="Details stayFit pull-right">{{objectif}}</span></Toolbar>
+    <div class="hidden">{{hasMod}}</div>
   </Window>
 </template>
 
@@ -99,7 +100,7 @@ import nanoid from "nanoid"
 import fs from "fs"
 import Countable from "countable"
 import * as path from 'path'
-import { remote } from "electron"
+import { remote, ipcRenderer } from "electron"
 const { getCurrentWindow, dialog, Menu, MenuItem, shell } = remote
 require('electron-disable-file-drop');
 
@@ -132,6 +133,17 @@ export default {
   },
 
   computed: {
+    hasMod: function() {
+      let vm = this;
+      let mod = false;
+      for(let item in vm.Editors) {
+        if (vm.Editors[item].Changed) {
+          mod = true;
+        }
+      }
+      ipcRenderer.send('update-notify-value', mod ? "1" : "0");
+      return mod;
+    },
     Footer: function() {
         if (this.selEdit == '') return "/";
         return this.Editors[this.selEdit].Path;

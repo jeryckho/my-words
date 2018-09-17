@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, dialog, ipcMain } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
 import {
@@ -14,6 +14,7 @@ if (isDevelopment) {
 }
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
+let Modified = "0";
 let mainWindow
 
 // Standard scheme must be registered before the app is ready
@@ -40,6 +41,19 @@ function createMainWindow () {
       })
     )
   }
+
+  window.on('close', (e) => {
+    if (Modified != "0") {
+      let ret = dialog.showMessageBox(window,{
+        buttons:["Oui", "Non"],
+        message:"Il y a des modifications non sauvegardées. Etes-vous sûr de vouloir quitter ?",
+        cancelId:1
+      });
+      if (ret == 1) {
+        e.preventDefault();
+      }
+    }
+  })
 
   window.on('closed', () => {
     mainWindow = null
@@ -77,4 +91,8 @@ app.on('ready', async () => {
     await installVueDevtools()
   }
   mainWindow = createMainWindow()
+})
+
+ipcMain.on('update-notify-value', function(event, arg) {
+  Modified = arg;
 })
