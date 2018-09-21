@@ -414,6 +414,10 @@ Avec espace : ${this.count.all}`;
       vm.selAlt = StoredAlt;
     }
 
+    ipcRenderer.on('closing', function() {
+      ipcRenderer.send('ok-to-close');
+    });
+
     vm.$nextTick(function () {
       const template = [
         {

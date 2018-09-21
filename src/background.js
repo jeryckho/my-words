@@ -15,6 +15,7 @@ if (isDevelopment) {
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let Modified = "0";
+let isClosing = false;
 let mainWindow
 
 // Standard scheme must be registered before the app is ready
@@ -43,14 +44,17 @@ function createMainWindow () {
   }
 
   window.on('close', (e) => {
-    if (Modified != "0") {
-      let ret = dialog.showMessageBox(window,{
-        buttons:["Oui", "Non"],
-        message:"Il y a des modifications non sauvegardées. Etes-vous sûr de vouloir quitter ?",
-        cancelId:1
-      });
-      if (ret == 1) {
-        e.preventDefault();
+    if (!isClosing) {
+      e.preventDefault();
+      if (Modified != "0") {
+        let ret = dialog.showMessageBox(window,{
+          buttons:["Oui", "Non"],
+          message:"Il y a des modifications non sauvegardées. Etes-vous sûr de vouloir quitter ?",
+          cancelId:1
+        });
+        if (ret != 1) {
+          mainWindow.webContents.send('closing')
+        }
       }
     }
   })
@@ -95,4 +99,9 @@ app.on('ready', async () => {
 
 ipcMain.on('update-notify-value', function(event, arg) {
   Modified = arg;
+})
+
+ipcMain.on('ok-to-close', function() {
+  isClosing = true;
+  app.quit();
 })
