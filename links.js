@@ -18,4 +18,7 @@ links = {
 	Tree1: "http://www.vuetoolbox.com/projects/vue-json-tree-view",
 	Tree2: "http://www.vuetoolbox.com/projects/vue-tree",
 	Tree3_Json: "https://jinkin1995.github.io/vue-json-edit/",
+	Tree4: "https://github.com/fluency03/vue-json-form",
+
+	Upload: "https://www.vuescript.com/vue-js-base64-file-upload/",
 }
