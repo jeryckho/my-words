@@ -415,7 +415,7 @@ Avec espace : ${this.count.all}`;
 
     var StoredDossier = window.localStorage.getItem('Dossier');
     if (StoredDossier != null) {
-      vm.Dossier = Dossier;
+      vm.Dossier = StoredDossier;
     }
     var StoredShown = window.localStorage.getItem('Shown');
     if (StoredShown != null) {
