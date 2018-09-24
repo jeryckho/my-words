@@ -14,4 +14,7 @@ links = {
 	VuePhotonKit: require('vue-photonkit'),
 
 	scrollTop: "https://developer.mozilla.org/fr/docs/Web/API/Element/scrollTop",
+
+	Tree1: "http://www.vuetoolbox.com/projects/vue-json-tree-view",
+	Tree2: "http://www.vuetoolbox.com/projects/vue-tree"
 }
