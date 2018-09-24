@@ -1,6 +1,6 @@
 {
   "name": "my-words",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Markdown editor in Electron",
   "author": {
     "name": "Jérôme CHERY"

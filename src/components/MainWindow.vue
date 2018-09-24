@@ -333,6 +333,7 @@ Avec espace : ${this.count.all}`;
 
       if (fileNames !== undefined) {
         vm.Dossier = fileNames[0];
+        window.localStorage.setItem('Dossier', vm.Dossier);
       }
     },
     toLoad: function() {
@@ -412,6 +413,10 @@ Avec espace : ${this.count.all}`;
   mounted: function () {
     var vm = this;
 
+    var StoredDossier = window.localStorage.getItem('Dossier');
+    if (StoredDossier != null) {
+      vm.Dossier = Dossier;
+    }
     var StoredShown = window.localStorage.getItem('Shown');
     if (StoredShown != null) {
       vm.shown = Object.assign(vm.shown, JSON.parse(StoredShown))
