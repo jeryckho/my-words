@@ -65,7 +65,7 @@
                 <TabItem :fixed="true" icon="plus" @click.native="addNew">
                 </TabItem>
               </TabGroup>
-              <div class="expanded" :class="{hidden: !hasFile}" >
+              <div class="expanded" :class="{hidden: ((!hasFile)||(selEdit==''))}" >
                 <editor
                   ref="aceeditor"
                   v-model="content"
@@ -414,7 +414,27 @@ Avec espace : ${this.count.all}`;
       vm.selAlt = StoredAlt;
     }
 
+    var StoredEditors = window.localStorage.getItem('Editors');
+    if (StoredEditors != null) {
+      let copie = JSON.parse(StoredEditors);
+      for(let item in copie) {
+        if (!copie[item].Changed) {
+          fs.readFile(copie[item].Path, 'utf8', function (err, data) {
+            copie[item].Content = data;
+          });
+        }
+      }
+      vm.Editors = Object.assign(copie);
+    }
+
     ipcRenderer.on('closing', function() {
+      let copie = Object.assign(vm.Editors);
+      for(let item in copie) {
+        if (!copie[item].Changed) {
+          delete copie[item].Content;
+        }
+      }
+      window.localStorage.setItem('Editors', JSON.stringify(copie));
       ipcRenderer.send('ok-to-close');
     });
 

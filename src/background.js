@@ -55,6 +55,8 @@ function createMainWindow () {
         if (ret != 1) {
           mainWindow.webContents.send('closing')
         }
+      } else {
+        mainWindow.webContents.send('closing')
       }
     }
   })
