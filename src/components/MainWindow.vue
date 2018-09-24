@@ -39,7 +39,7 @@
     </Toolbar>
     <WindowContent>
       <PaneGroup>
-        <Pane size="mini" :sidebar="true" :class="{hidden: !shown.sidebar}">sidebar</Pane>
+        <Pane size="sm" :sidebar="true" :class="{hidden: !shown.sidebar}">{{Dossier}}</Pane>
         <Pane>
           <VueSplit
             :elements="panes"
@@ -113,6 +113,7 @@ export default {
 
   data() {
     return {
+      Dossier: '',
       selEdit: '',
       precEdit: '',
       Editors: {},
@@ -323,6 +324,17 @@ Avec espace : ${this.count.all}`;
         }
       }
     },
+    toOpen: function() {
+      var vm = this;
+      var fileNames = dialog.showOpenDialog(getCurrentWindow(), {
+        properties: [
+          'openDirectory'
+        ]});
+
+      if (fileNames !== undefined) {
+        vm.Dossier = fileNames[0];
+      }
+    },
     toLoad: function() {
       var vm = this;
       var fileNames = dialog.showOpenDialog(getCurrentWindow(), {
@@ -444,6 +456,7 @@ Avec espace : ${this.count.all}`;
           label: 'Fichier',
             submenu: [
               { label:'Nouveau Fichier', accelerator: 'CommandOrControl+N', click: vm.addNew },
+              { label:'Ouvrir Dossier', accelerator: 'CommandOrControl+D', click: vm.toOpen },
               { label:'Ouvrir Fichier', accelerator: 'CommandOrControl+O', click: vm.toLoad },
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
               {type: 'separator'},
