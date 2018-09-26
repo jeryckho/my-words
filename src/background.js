@@ -1,5 +1,6 @@
 'use strict'
 
+import fs from 'fs'
 import { app, protocol, BrowserWindow, dialog, ipcMain } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
@@ -106,4 +107,29 @@ ipcMain.on('update-notify-value', function(event, arg) {
 ipcMain.on('ok-to-close', function() {
   isClosing = true;
   app.quit();
+})
+
+ipcMain.on('print-pdf', function(event, arg) {
+
+  let window_to_PDF = new BrowserWindow({show : true});
+
+  window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(arg));
+  window_to_PDF.webContents.printToPDF({
+    landscape: false,
+    marginsType: 0,
+    printBackground: false,
+    printSelectionOnly: false,
+    pageSize: "A4",
+  }, function(err, data) {
+    if (err) {
+        //do whatever you want
+        return;
+    }
+    try{
+        fs.writeFileSync('./generated_pdf.pdf', data);
+    }catch(err){
+        //unable to save pdf..
+    }
+  })
+
 })

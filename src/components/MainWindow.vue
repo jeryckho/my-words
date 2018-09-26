@@ -295,6 +295,9 @@ Avec espace : ${this.count.all}`;
       vm.$delete( vm.Editors, ID );
       vm.Resize( () => { vm.precEdit = Sel })
     },
+    toExport: function() {
+      ipcRenderer.send('print-pdf', this.marked);
+    },
     toSave: function() {
       var vm = this;
       let Sel = vm.selEdit;
@@ -464,6 +467,7 @@ Avec espace : ${this.count.all}`;
               { label:'Ouvrir Dossier', accelerator: 'CommandOrControl+D', click: vm.toOpen },
               { label:'Ouvrir Fichier', accelerator: 'CommandOrControl+O', click: vm.toLoad },
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
+              { label:'Exporter', accelerator: 'CommandOrControl+P', click: vm.toExport },
               {type: 'separator'},
               { label:'Quitter', role: 'quit'}
           ]

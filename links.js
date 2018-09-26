@@ -21,4 +21,12 @@ links = {
 	Tree4: "https://github.com/fluency03/vue-json-form",
 
 	Upload: "https://www.vuescript.com/vue-js-base64-file-upload/",
+
+	GDrive: "https://github.com/tralves/vue-gdrive",
+
+	SpellCheck1: "https://github.com/ajaxorg/ace/wiki/Syntax-validation",
+	SpellCheck2: "https://stackoverflow.com/questions/21284979/ace-editor-customizing-syntax-error-gutter",
+
+	PDF: "https://medium.com/@ishwar.rimal/generating-pdf-with-electron-js-31b59ac93249",
+	PDF2: "https://gist.github.com/dannvix/dc0efdbb75bf79a79d1c",
 }
