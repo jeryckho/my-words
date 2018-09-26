@@ -111,25 +111,24 @@ ipcMain.on('ok-to-close', function() {
 
 ipcMain.on('print-pdf', function(event, arg) {
 
-  let window_to_PDF = new BrowserWindow({show : true});
+  let window_to_PDF = new BrowserWindow({show : false});
 
   window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(arg));
-  window_to_PDF.webContents.printToPDF({
-    landscape: false,
-    marginsType: 0,
-    printBackground: false,
-    printSelectionOnly: false,
-    pageSize: "A4",
-  }, function(err, data) {
-    if (err) {
-        //do whatever you want
-        return;
-    }
-    try{
-        fs.writeFileSync('./generated_pdf.pdf', data);
-    }catch(err){
-        //unable to save pdf..
-    }
+  window_to_PDF.webContents.on('did-finish-load', () => {
+    window_to_PDF.webContents.printToPDF({
+      landscape: false,
+      marginsType: 0,
+      printBackground: false,
+      printSelectionOnly: false,
+      pageSize: "A4",
+    }, function(err, data) {
+      if (err) {
+          return;
+      }
+      try{
+          fs.writeFileSync('./generated_pdf.pdf', data);
+      } catch(err){
+      }
+    })
   })
-
 })
