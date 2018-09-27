@@ -65,10 +65,10 @@
                 <TabItem :fixed="true" icon="plus" @click.native="addNew">
                 </TabItem>
               </TabGroup>
-              <div class="expanded" :class="{hidden: ((!hasFile)||(selEdit==''))}" >
+              <div v-for="item in Editors" :name="item.ID" :key="item.ID" class="expanded" :class="{hidden: selEdit!=item.ID}" >
                 <editor
-                  ref="aceeditor"
-                  v-model="content"
+                  :ref="item.ID"
+                  v-model="item.Content"
                   @init="editorInit"
                   lang="markdown"
                   theme="chrome"
@@ -152,27 +152,11 @@ export default {
     hasFile: function() {
       return (Object.keys(this.Editors).length !== 0)
     },
-    content: {
-      get: function() {
-        if (this.selEdit == '') return "";
-        return this.Editors[this.selEdit].Content;
-      },
-      set: function(Content) {
-        let Sel = this.selEdit;
-        let Prc = this.precEdit;
-        if ( Sel != "") {
-          const org = this.Editors[Sel].Content;
-          const stat = this.Editors[Sel].Changed;
-          const Changed = stat || ( (Prc == Sel) && ( Content !== org ) );
-          this.SetEdit( Sel, { Content, Changed } );
-        }
-      }
-    },
     editor: function() {
-      return this.$refs.aceeditor;
+        return (this.selEdit) ? this.$refs[this.selEdit][0] : null;
     },
     mattered: function() {
-      return matter(this.content);
+      return matter((this.selEdit) ? this.Editors[this.selEdit].Content : "");
     },
     marked: function () {
       return Marked(this.mattered.content);
@@ -218,52 +202,65 @@ Avec espace : ${this.count.all}`;
     SetEdit: function(ID, ext) {
       this.$set( this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext) );
     },
-    waitNext: function() {
+    waitNext: function(cb) {
       this.$nextTick(() => {
+        if (this.editor && this.editor.editor) {
           this.editor.editor.focus();
+        }
+        if (cb) {
+          cb();
+        }
       });
     },
     Resize: function(cb) {
       this.$nextTick(() => {
-        this.editor.editor.resize();
-        this.editor.editor.focus();
+        if (this.editor && this.editor.editor) {
+          this.editor.editor.resize();
+          this.editor.editor.focus();
+        }
         if (cb) {
           cb();
         }
       })
     },
     makeBold: function() {
-      let selection = this.editor.editor.getSelection();
-      if (! selection.isEmpty()) {
-          let selectedRange = this.editor.editor.getSelectionRange();
-          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-          this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
-      } else {
-          this.editor.editor.insert('**GRAS**');
+      if (this.editor && this.editor.editor) {
+        let selection = this.editor.editor.getSelection();
+        if (! selection.isEmpty()) {
+            let selectedRange = this.editor.editor.getSelectionRange();
+            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+            this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
+        } else {
+            this.editor.editor.insert('**GRAS**');
+        }
+        this.waitNext();
       }
-      this.waitNext();
     },
     makeItal: function() {
-      let selection = this.editor.editor.getSelection();
-      if (! selection.isEmpty()) {
-          let selectedRange = this.editor.editor.getSelectionRange();
-          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-          this.editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
-      } else {
-          this.editor.editor.insert('*_ITAL_');
+      if (this.editor && this.editor.editor) {
+        let selection = this.editor.editor.getSelection();
+        if (! selection.isEmpty()) {
+            let selectedRange = this.editor.editor.getSelectionRange();
+            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+            this.editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
+        } else {
+            this.editor.editor.insert('*_ITAL_');
+        }
+        this.waitNext();
       }
-      this.waitNext();
     },
     shellGo: function(empty,full) {
-      let selection = this.editor.editor.getSelection();
-      if (! selection.isEmpty()) {
-        let selectedRange = this.editor.editor.getSelectionRange();
-        let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-        shell.openExternal(full + selectedText);
-      } else {
-        shell.openExternal(empty)
+      if (this.editor && this.editor.editor) {
+        let selection = this.editor.editor.getSelection();
+        if (! selection.isEmpty()) {
+          let selectedRange = this.editor.editor.getSelectionRange();
+          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+          shell.openExternal(full + selectedText);
+        } else {
+          shell.openExternal(empty)
+        }
+        this.waitNext();
       }
-      this.waitNext();
     },
     clkCtx: function() {
       this.CtxMenu.popup({window: getCurrentWindow()})
@@ -397,14 +394,16 @@ Avec espace : ${this.count.all}`;
       this.Reconfig();
     },
     Reconfig: function() {
-      let editor = this.editor.editor;
-      editor.setWrapBehavioursEnabled(true);
-      editor.setShowInvisibles(this.config.showInvisibles);
-      editor.setShowFoldWidgets(this.config.showFoldWidgets);
-      editor.setShowPrintMargin(this.config.showPrintMargin);
-      editor.getSession().setUseWrapMode(this.config.useWrapMode);
-      editor.getSession().setUseSoftTabs(true);
-      this.waitNext();
+      if (this.editor && this.editor.editor) {
+        let editor = this.editor.editor;
+        editor.setWrapBehavioursEnabled(true);
+        editor.setShowInvisibles(this.config.showInvisibles);
+        editor.setShowFoldWidgets(this.config.showFoldWidgets);
+        editor.setShowPrintMargin(this.config.showPrintMargin);
+        editor.getSession().setUseWrapMode(this.config.useWrapMode);
+        editor.getSession().setUseSoftTabs(true);
+        this.waitNext();
+      }
     }
   },
 
@@ -439,12 +438,11 @@ Avec espace : ${this.count.all}`;
       let copie = JSON.parse(StoredEditors);
       for(let item in copie) {
         if (!copie[item].Changed) {
-          fs.readFile(copie[item].Path, 'utf8', function (err, data) {
-            copie[item].Content = data;
-          });
+          let data = fs.readFileSync(copie[item].Path, 'utf8');
+          copie[item].Content = data;
         }
       }
-      vm.Editors = Object.assign(copie);
+      Object.assign(vm.Editors, copie);
     }
 
     ipcRenderer.on('closing', function() {
