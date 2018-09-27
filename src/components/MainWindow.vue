@@ -73,6 +73,7 @@
                   lang="markdown"
                   theme="chrome"
                   @click.right.native="clkCtx"
+                  @input="setMaster"
                 >
                 </editor>
               </div>
@@ -91,6 +92,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import jthf from "json-to-html-form"
 import VueSplit from "./VueSplit.vue";
 import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
@@ -113,6 +115,7 @@ export default {
 
   data() {
     return {
+      Master: '',
       Dossier: '',
       selEdit: '',
       precEdit: '',
@@ -129,6 +132,14 @@ export default {
         showFoldWidgets: true,
         showPrintMargin: true,
         useWrapMode: true
+      }
+    }
+  },
+
+  watch: {
+    selEdit: function (newSel, oldSel) {
+      if (newSel !== oldSel) {
+        this.Master = this.Editors[newSel].Content;
       }
     }
   },
@@ -156,7 +167,7 @@ export default {
         return (this.selEdit) ? this.$refs[this.selEdit][0] : null;
     },
     mattered: function() {
-      return matter((this.selEdit) ? this.Editors[this.selEdit].Content : "");
+      return matter((this.selEdit) ? this.Master : "");
     },
     marked: function () {
       return Marked(this.mattered.content);
@@ -200,7 +211,7 @@ Avec espace : ${this.count.all}`;
 
   methods: {
     SetEdit: function(ID, ext) {
-      this.$set( this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext) );
+      this.Editors[ID] = Object.assign(this.Editors[ID] || {}, ext);
     },
     waitNext: function(cb) {
       this.$nextTick(() => {
@@ -317,7 +328,7 @@ Avec espace : ${this.count.all}`;
           } else {
             // eslint-disable-next-line
             fs.writeFile(Item.Path, Item.Content, function(err, data) {
-                vm.SetEdit( Sel, { Changed: false })
+              vm.SetEdit( Sel, { Changed: false })
             });
           }
           vm.waitNext();
@@ -364,6 +375,10 @@ Avec espace : ${this.count.all}`;
           vm.Resize( () => { vm.precEdit = ID })
         });
       }
+    },
+    setMaster: function(content) {
+      this.Master = content;
+      this.SetEdit(this.selEdit, { Changed: true });
     },
     editorInit: function () {
       require('brace/ext/language_tools') //language extension prerequsite...
