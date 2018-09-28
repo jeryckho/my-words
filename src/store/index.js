@@ -23,12 +23,14 @@ export default new Vuex.Store({
     dossier: "",
   },
   mutations: {
-    invertShown(state, pane) { state.shown[pane] = !state.shown[pane]; },
-    updateShown(state, payload) { state.shown[payload.target] = payload.value; },
-    invertConfig(state, conf) { state.config[conf] = !state.config[conf]; },
-    updateConfig(state, payload) { state.config[payload.target] = payload.value; },
-    updateSelected(state, payload) { state.selected[payload.target] = payload.value },
-    updateDossier(state, value) { state.dossier = value },
+    updateShown(state, payload)     { fUpdateShown(state, payload) },
+    invertShown(state, pane)        { fUpdateShown(state, { target: pane, value: !state.shown[pane] }) },
+
+    updateConfig(state, payload)    { fUpdateConfig(state, payload) },
+    invertConfig(state, conf)       { fUpdateConfig(state, { target: conf, value: !state.config[conf] }) },
+
+    updateSelected(state, payload)  { fUpdate(state, payload, 'selected') },
+    updateDossier(state, value)     { state.dossier = value },
 
     importState(state) {
       let loc;
@@ -62,3 +64,13 @@ export default new Vuex.Store({
   },
   strict: true
 });
+
+function fUpdate(state, payload, level) {
+  state[level][payload.target] = payload.value;
+}
+function fUpdateShown(state, payload) {
+  fUpdate(state, payload, 'shown')
+}
+function fUpdateConfig(state, payload) {
+  fUpdate(state, payload, 'config')
+}
