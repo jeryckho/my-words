@@ -52,27 +52,26 @@
             <div id="mainPane" :class="{hidden: !shownMainPane}">
               <TabGroup>
                 <TabItem
-                  v-for="item in Editors"
+                  v-for="ID in EditorList"
                   class="stayFit"
-                  :key="item.ID"
-                  :active="item.ID==selEdit"
+                  :key="ID"
+                  :active="ID==selEdit"
                   :class="{hidden: !hasFile}"
-                  :title="item.Path"
-                  @click.native="Select(item.ID)"
-                  @cancel="toClose(item.ID)">
-                  {{item.Title}}{{item.Changed?"*":""}}
+                  :title="Editors[ID].Path"
+                  @click.native="Select(ID)"
+                  @cancel="toClose(ID)">
+                  {{Editors[ID].Title}}{{Editors[ID].Changed?"*":""}}
                 </TabItem>
                 <TabItem :fixed="true" icon="plus" @click.native="addNew">
                 </TabItem>
               </TabGroup>
-              <div v-for="item in Editors" :name="item.ID" :key="item.ID" class="expanded" :class="{hidden: selEdit!=item.ID}" >
+              <div v-for="ID in EditorList" :name="ID" :key="ID" class="expanded" :class="{hidden: selEdit!=ID}" >
                 <editor
-                  :ref="item.ID"
-                  v-model="item.Content"
+                  :ref="ID"
+                  v-model="Editors[ID].Content"
                   @init="editorInit"
                   lang="markdown"
                   theme="chrome"
-                  @click.right.native="clkCtx"
                   @input="setMaster"
                 >
                 </editor>
@@ -117,7 +116,6 @@ export default {
   data() {
     return {
       CtxMenu: {},
-      // Editors: {},
       Master: "",
     }
   },
@@ -139,6 +137,7 @@ export default {
       configShowFoldWidgets: state => state.config.showFoldWidgets,
       configShowPrintMargin: state => state.config.showPrintMargin,
       configUseWrapMode: state => state.config.useWrapMode,
+      EditorList: state => state.editList,
     }),
 
     selEdit: {
@@ -160,13 +159,7 @@ export default {
     },
 
     hasMod: function() {
-      let vm = this;
-      let mod = false;
-      for(let item in vm.Editors) {
-        if (vm.Editors[item].Changed) {
-          mod = true;
-        }
-      }
+      let mod = this.$store.getters.hasMod();
       ipcRenderer.send('update-notify-value', mod ? "1" : "0");
       return mod;
     },
@@ -228,17 +221,13 @@ Avec espace : ${this.count.all}`;
       'updateDossier',
       'importState',
       'exportState',
+      'updateEdits',
+      'createEdit',
+      'modifyEdit',
+      'deleteEdit'
     ]),
     editor: function() {
         return (this.selEdit) ? (this.$refs[this.selEdit] ? this.$refs[this.selEdit][0] : null ) : null;
-    },
-    SetEdit: function(ID, ext) {
-      let vm = this;
-      // if (ID in vm.Editors) {
-        // vm.Editors[ID] = {...vm.Editors[ID], ...sext}
-      // } else {
-        vm.Editors[ID] =  {...ext}
-      // }
     },
     waitNext: function(cb) {
       let vm = this;
@@ -314,7 +303,7 @@ Avec espace : ${this.count.all}`;
     addNew: function() {
       let vm = this;
       var ID = nanoid();
-      vm.SetEdit( ID, {
+      vm.createEdit({
         ID: ID,
         Title: "Untitled",
         Path: "Untitled",
@@ -334,7 +323,7 @@ Avec espace : ${this.count.all}`;
         }
       }
       vm.selEdit = Sel;
-      vm.$delete( vm.Editors, ID );
+      vm.deleteEdit({ ID });
       vm.Resize()
     },
     toExport: function() {
@@ -356,13 +345,13 @@ Avec espace : ${this.count.all}`;
             if (typeof fileName !== 'undefined') {
               // eslint-disable-next-line
               fs.writeFile(fileName, Item.Content, function(err, data) {
-                vm.SetEdit( Sel, { New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
+                vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
               });
             }
           } else {
             // eslint-disable-next-line
             fs.writeFile(Item.Path, Item.Content, function(err, data) {
-              vm.SetEdit( Sel, { Changed: false })
+              vm.modifyEdit( { ID: Sel, Changed: false })
             });
           }
           vm.waitNext();
@@ -396,7 +385,7 @@ Avec espace : ${this.count.all}`;
         var fileName = fileNames[0];
         fs.readFile(fileName, 'utf8', function (err, data) {
           var ID = fileName;
-          vm.SetEdit( ID, {
+          vm.createEdit( {
             ID: ID,
             Title: path.basename(ID),
             Path: ID,
@@ -410,8 +399,9 @@ Avec espace : ${this.count.all}`;
       }
     },
     setMaster: function(content) {
-      this.Master = content;
-      this.SetEdit(this.selEdit, { Changed: true });
+      let vm = this;
+      vm.Master = content;
+      vm.modifyEdit({ ID: vm.selEdit, Changed: true });
     },
     editorInit: function () {
       require('brace/ext/language_tools') //language extension prerequsite...
@@ -461,34 +451,15 @@ Avec espace : ${this.count.all}`;
   mounted: function () {
     var vm = this;
 
-    var StoredEditors = window.localStorage.getItem('Editors');
-    if (StoredEditors != null) {
-      let copie = JSON.parse(StoredEditors);
-      for(let item in copie) {
-        if (!copie[item].Changed) {
-          let data = fs.readFileSync(copie[item].Path, 'utf8');
-          copie[item].Content = data;
-        }
-      }
-      Object.assign(vm.Editors, copie);
-    }
-
-      vm.importState();
-      vm.Reconfig();
-
     ipcRenderer.on('closing', function() {
-      let copie = Object.assign(vm.Editors);
-      for(let item in copie) {
-        if (!copie[item].Changed) {
-          delete copie[item].Content;
-        }
-      }
-      window.localStorage.setItem('Editors', JSON.stringify(copie));
       vm.exportState();
       ipcRenderer.send('ok-to-close');
     });
 
     vm.$nextTick(function () {
+      vm.importState();
+      vm.Reconfig();
+
       const template = [
         {
           label: 'Fichier',

@@ -27,6 +27,7 @@ export default new Vuex.Store({
   getters: {
     editSet: state => state.editList.map( editId => state.edits[editId] ),
     isInEdit: state => id => state.editList.includes(id),
+    hasMod: state => () => state.editList.reduce((prev, key) => (prev || state.edits[key].Changed), false),
   },
   mutations: {
     updateShown(state, payload)     { fUpdateShown(state, payload) },
@@ -40,8 +41,32 @@ export default new Vuex.Store({
 
     updateEdits(state, payload)     { state.edits = payload },
 
+    createEdit(state, payload) {
+      state.edits[payload.ID] = payload;
+      state.editList.push(payload.ID);
+    },
+    modifyEdit(state, payload) {
+      state.edits[payload.ID] = {...state.edits[payload.ID], ...payload};      
+    },
+    deleteEdit(state,payload) {
+      state.editList = state.editList.filter(value => value !== payload.ID)
+      delete state.edits[payload.ID];
+    },
+
     importState(state) {
       let loc;
+      loc = window.localStorage.getItem('Editors');
+      if (loc != null) {
+        let copie = JSON.parse(loc);
+        for(let item in copie) {
+          // if (!copie[item].Changed) {
+          //   let data = fs.readFileSync(copie[item].Path, 'utf8');
+          //   copie[item].Content = data;
+          // }
+        }
+        state.edits = copie
+        state.editList = Object.keys(copie)
+      }
       loc = window.localStorage.getItem('Shown');
       if (loc != null) {
         state.shown = { ...state.shown, ...JSON.parse(loc)}
@@ -61,6 +86,13 @@ export default new Vuex.Store({
     },
 
     exportState(state) {
+      let copie = { ...state.edits};
+      for(let item in copie) {
+        // if (!copie[item].Changed) {
+        //   delete copie[item].Content;
+        // }
+      }
+      window.localStorage.setItem('Editors', JSON.stringify(copie));
       window.localStorage.setItem('Shown', JSON.stringify(state.shown));
       window.localStorage.setItem('Config', JSON.stringify(state.config));
       window.localStorage.setItem('Selected', JSON.stringify(state.selected));
@@ -68,7 +100,7 @@ export default new Vuex.Store({
     }
 
   },
-  strict: true
+  strict: false
 });
 
 function fUpdate(state, payload, level) {

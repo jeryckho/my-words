@@ -17,5 +17,6 @@
 [X] Empecher le drop de fichiers
 [] Composant Metadonnées
 [X] Save Etat (dont Changed)
-[] Generate PDF
-[] Bug nb char sur autoload
+[X] Generate PDF
+[X] Bug nb char sur autoload
+[] Bug multi config
