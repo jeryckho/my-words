@@ -3,31 +3,31 @@
     <Toolbar type="header">
       <ToolbarActions>
         <ButtonGroup class="pull-left">
-          <Button size="sm" :active="!shown.sidebar" @click.native="Unshow('sidebar')">
+          <Button size="sm" :active="!shownSidebar" @click.native="Unshow('sidebar')">
             <Icon icon="folder"></Icon>
           </Button>
-          <Button size="sm" :active="!shown.mainPane" @click.native="Unshow('mainPane')">
+          <Button size="sm" :active="!shownMainPane" @click.native="Unshow('mainPane')">
             <Icon icon="quote"></Icon>
           </Button>
-          <Button size="sm" :active="!shown.altPane" @click.native="Unshow('altPane')">
+          <Button size="sm" :active="!shownAltPane" @click.native="Unshow('altPane')">
             <Icon icon="tools"></Icon>
           </Button>
         </ButtonGroup>
         <ButtonGroup class="pull-left" :class="{hidden: selEdit==''}">
-          <Button size="sm" :active="!config.showInvisibles" @click.native="Unconfig('showInvisibles')">
+          <Button size="sm" :active="!configShowInvisibles" @click.native="Unconfig('showInvisibles')">
             <Icon icon="block"></Icon>
           </Button>
-          <Button size="sm" :active="!config.showFoldWidgets" @click.native="Unconfig('showFoldWidgets')">
+          <Button size="sm" :active="!configShowFoldWidgets" @click.native="Unconfig('showFoldWidgets')">
             <Icon icon="flow-cascade"></Icon>
           </Button>
-          <Button size="sm" :active="!config.showPrintMargin" @click.native="Unconfig('showPrintMargin')">
+          <Button size="sm" :active="!configShowPrintMargin" @click.native="Unconfig('showPrintMargin')">
             <Icon icon="list"></Icon>
           </Button>
-          <Button size="sm" :active="!config.useWrapMode" @click.native="Unconfig('useWrapMode')">
+          <Button size="sm" :active="!configUseWrapMode" @click.native="Unconfig('useWrapMode')">
             <Icon icon="level-down"></Icon>
           </Button>
         </ButtonGroup>
-        <ButtonGroup class="pull-right" :class="{hidden: !shown.altPane}">
+        <ButtonGroup class="pull-right" :class="{hidden: !shownAltPane}">
           <Button size="sm" :active="selAlt=='sRendu'" @click.native="SelAlt('sRendu')">
             <Icon icon="doc-text"></Icon>
           </Button>
@@ -39,7 +39,7 @@
     </Toolbar>
     <WindowContent>
       <PaneGroup>
-        <Pane size="sm" :sidebar="true" :class="{hidden: !shown.sidebar}">{{Dossier}}</Pane>
+        <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}">{{Dossier}}</Pane>
         <Pane>
           <VueSplit
             :elements="panes"
@@ -49,7 +49,7 @@
             :snap-offset="50"
             @onDragEnd="Resize()"
           >
-            <div id="mainPane" :class="{hidden: !shown.mainPane}">
+            <div id="mainPane" :class="{hidden: !shownMainPane}">
               <TabGroup>
                 <TabItem
                   v-for="item in Editors"
@@ -78,7 +78,7 @@
                 </editor>
               </div>
             </div>
-            <div id="altPane" :class="{hidden: !shown.altPane}" style="overflow-y:auto;">
+            <div id="altPane" :class="{hidden: !shownAltPane}" style="overflow-y:auto;">
               <div v-if="selEdit != ''" v-html="marked" :class="{hidden: selAlt != 'sRendu'}"></div>
               <div v-if="selEdit != ''" v-html="jshtm" :class="{hidden: selAlt != 'sFront'}"></div>
             </div>
@@ -93,6 +93,7 @@
 
 <script>
 import Vue from 'vue'
+import { mapState, mapMutations } from 'vuex'
 import jthf from "json-to-html-form"
 import VueSplit from "./VueSplit.vue";
 import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
@@ -115,24 +116,9 @@ export default {
 
   data() {
     return {
-      Master: '',
-      Dossier: '',
-      selEdit: '',
-      precEdit: '',
-      Editors: {},
-      selAlt: "sRendu",
-      shown: {
-        sidebar: false,
-        mainPane : true,
-        altPane: false
-      },
       CtxMenu: {},
-      config: {
-        showInvisibles: true,
-        showFoldWidgets: true,
-        showPrintMargin: true,
-        useWrapMode: true
-      }
+      Editors: {},
+      Master: "",
     }
   },
 
@@ -145,6 +131,33 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      shownSidebar: state => state.shown.sidebar,
+      shownMainPane: state => state.shown.mainPane,
+      shownAltPane: state => state.shown.altPane,
+      configShowInvisibles: state => state.config.showInvisibles,
+      configShowFoldWidgets: state => state.config.showFoldWidgets,
+      configShowPrintMargin: state => state.config.showPrintMargin,
+      configUseWrapMode: state => state.config.useWrapMode,
+    }),
+
+    selEdit: {
+      get () { return this.$store.state.selected.edit },
+      set (value) { this.updateSelected({ target: 'edit', value: value}) }
+    },
+    precEdit: {
+      get () { return this.$store.state.selected.prev },
+      set (value) { this.updateSelected({ target: 'prev', value: value}) }
+    },
+    selAlt: {
+      get () { return this.$store.state.selected.alt },
+      set (value) { this.updateSelected({ target: 'alt', value: value}) }
+    },
+    Dossier: {
+      get () { return this.$store.state.dossier },
+      set (value) { this.updateDossier(value) }
+    },
+
     hasMod: function() {
       let vm = this;
       let mod = false;
@@ -162,9 +175,6 @@ export default {
     },
     hasFile: function() {
       return (Object.keys(this.Editors).length !== 0)
-    },
-    editor: function() {
-        return (this.selEdit) ? this.$refs[this.selEdit][0] : null;
     },
     mattered: function() {
       return matter((this.selEdit) ? this.Master : "");
@@ -199,10 +209,10 @@ Avec espace : ${this.count.all}`;
     },
     panes: function() {
       var res = [];
-      if (this.shown.mainPane) {
+      if (this.shownMainPane) {
         res.push('#mainPane');
       }
-      if (this.shown.altPane) {
+      if (this.shownAltPane) {
         res.push('#altPane');
       }
       return res;
@@ -210,13 +220,26 @@ Avec espace : ${this.count.all}`;
   },
 
   methods: {
+    ...mapMutations([
+      'invertShown',
+      'invertConfig',
+      'updateSelected',
+      'updateDossier',
+      'importState',
+      'exportState',
+    ]),
+    editor: function() {
+        return (this.selEdit) ? (this.$refs[this.selEdit] ? this.$refs[this.selEdit][0] : null ) : null;
+    },
     SetEdit: function(ID, ext) {
       this.Editors[ID] = Object.assign(this.Editors[ID] || {}, ext);
     },
     waitNext: function(cb) {
-      this.$nextTick(() => {
-        if (this.editor && this.editor.editor) {
-          this.editor.editor.focus();
+      let vm = this;
+      vm.$nextTick(() => {
+        let editor = vm.editor()
+        if (editor && editor.editor) {
+          editor.editor.focus();
         }
         if (cb) {
           cb();
@@ -224,10 +247,12 @@ Avec espace : ${this.count.all}`;
       });
     },
     Resize: function(cb) {
-      this.$nextTick(() => {
-        if (this.editor && this.editor.editor) {
-          this.editor.editor.resize();
-          this.editor.editor.focus();
+      let vm = this;
+      vm.$nextTick(() => {
+        let editor = vm.editor()
+        if (editor && editor.editor) {
+          editor.editor.resize();
+          editor.editor.focus();
         }
         if (cb) {
           cb();
@@ -235,37 +260,40 @@ Avec espace : ${this.count.all}`;
       })
     },
     makeBold: function() {
-      if (this.editor && this.editor.editor) {
-        let selection = this.editor.editor.getSelection();
+      let editor = this.editor()
+      if (editor && editor.editor) {
+        let selection = editor.editor.getSelection();
         if (! selection.isEmpty()) {
-            let selectedRange = this.editor.editor.getSelectionRange();
-            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-            this.editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
+            let selectedRange = editor.editor.getSelectionRange();
+            let selectedText = editor.editor.getSession().getDocument().getTextRange(selectedRange);
+            editor.editor.getSession().getDocument().replace(selectedRange, `**${selectedText}**`);
         } else {
-            this.editor.editor.insert('**GRAS**');
+            editor.editor.insert('**GRAS**');
         }
         this.waitNext();
       }
     },
     makeItal: function() {
-      if (this.editor && this.editor.editor) {
-        let selection = this.editor.editor.getSelection();
+      let editor = this.editor()
+      if (editor && editor.editor) {
+        let selection = editor.editor.getSelection();
         if (! selection.isEmpty()) {
-            let selectedRange = this.editor.editor.getSelectionRange();
-            let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
-            this.editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
+            let selectedRange = editor.editor.getSelectionRange();
+            let selectedText = editor.editor.getSession().getDocument().getTextRange(selectedRange);
+            editor.editor.getSession().getDocument().replace(selectedRange, `_${selectedText}_`);
         } else {
-            this.editor.editor.insert('*_ITAL_');
+            editor.editor.insert('*_ITAL_');
         }
         this.waitNext();
       }
     },
     shellGo: function(empty,full) {
-      if (this.editor && this.editor.editor) {
-        let selection = this.editor.editor.getSelection();
+      let editor = this.editor()
+      if (editor && editor.editor) {
+        let selection = editor.editor.getSelection();
         if (! selection.isEmpty()) {
-          let selectedRange = this.editor.editor.getSelectionRange();
-          let selectedText = this.editor.editor.getSession().getDocument().getTextRange(selectedRange);
+          let selectedRange = editor.editor.getSelectionRange();
+          let selectedText = editor.editor.getSession().getDocument().getTextRange(selectedRange);
           shell.openExternal(full + selectedText);
         } else {
           shell.openExternal(empty)
@@ -344,7 +372,6 @@ Avec espace : ${this.count.all}`;
 
       if (fileNames !== undefined) {
         vm.Dossier = fileNames[0];
-        window.localStorage.setItem('Dossier', vm.Dossier);
       }
     },
     toLoad: function() {
@@ -393,30 +420,28 @@ Avec espace : ${this.count.all}`;
     },
     SelAlt: function(sel) {
       this.selAlt = sel;
-      window.localStorage.setItem('SelAlt', sel);
       this.Resize();
     },
     Unshow: function(show) {
-      this.shown[show] = !this.shown[show];
-      window.localStorage.setItem('Shown', JSON.stringify(this.shown));
+      this.invertShown(show)
       if (this.selEdit != "") {
         this.Resize();
       }
     },
     Unconfig: function(conf) {
-      this.config[conf] = !this.config[conf];
-      window.localStorage.setItem('Config', JSON.stringify(this.config));
+      thisinvertConfig(conf)
       this.Reconfig();
     },
-    Reconfig: function() {
-      if (this.editor && this.editor.editor) {
-        let editor = this.editor.editor;
-        editor.setWrapBehavioursEnabled(true);
-        editor.setShowInvisibles(this.config.showInvisibles);
-        editor.setShowFoldWidgets(this.config.showFoldWidgets);
-        editor.setShowPrintMargin(this.config.showPrintMargin);
-        editor.getSession().setUseWrapMode(this.config.useWrapMode);
-        editor.getSession().setUseSoftTabs(true);
+    Reconfig: function() { // TO REFACTOR
+      let editor = this.editor()
+      if (editor && editor.editor) {
+        let Zeditor = editor.editor;
+        Zeditor.setWrapBehavioursEnabled(true);
+        Zeditor.setShowInvisibles(this.configShowInvisibles);
+        Zeditor.setShowFoldWidgets(this.configShowFoldWidgets);
+        Zeditor.setShowPrintMargin(this.configShowPrintMargin);
+        Zeditor.getSession().setUseWrapMode(this.configUseWrapMode);
+        Zeditor.getSession().setUseSoftTabs(true);
         this.waitNext();
       }
     }
@@ -430,24 +455,6 @@ Avec espace : ${this.count.all}`;
   mounted: function () {
     var vm = this;
 
-    var StoredDossier = window.localStorage.getItem('Dossier');
-    if (StoredDossier != null) {
-      vm.Dossier = StoredDossier;
-    }
-    var StoredShown = window.localStorage.getItem('Shown');
-    if (StoredShown != null) {
-      vm.shown = Object.assign(vm.shown, JSON.parse(StoredShown))
-    }
-    var StoredConfig = window.localStorage.getItem('Config');
-    if (StoredConfig != null) {
-      vm.config = Object.assign(vm.config, JSON.parse(StoredConfig))
-      vm.Reconfig();
-    }
-    var StoredAlt = window.localStorage.getItem('SelAlt');
-    if (StoredAlt != null) {
-      vm.selAlt = StoredAlt;
-    }
-
     var StoredEditors = window.localStorage.getItem('Editors');
     if (StoredEditors != null) {
       let copie = JSON.parse(StoredEditors);
@@ -460,6 +467,9 @@ Avec espace : ${this.count.all}`;
       Object.assign(vm.Editors, copie);
     }
 
+    vm.importState();
+    vm.Reconfig();
+
     ipcRenderer.on('closing', function() {
       let copie = Object.assign(vm.Editors);
       for(let item in copie) {
@@ -468,6 +478,7 @@ Avec espace : ${this.count.all}`;
         }
       }
       window.localStorage.setItem('Editors', JSON.stringify(copie));
+      vm.exportState();
       ipcRenderer.send('ok-to-close');
     });
 

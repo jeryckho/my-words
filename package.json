@@ -1,6 +1,6 @@
 {
   "name": "my-words",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Markdown editor in Electron",
   "author": {
     "name": "Jérôme CHERY"
@@ -30,7 +30,8 @@
     "split.js": "^1.3.5",
     "vue": "^2.5.17",
     "vue-photonkit": "^1.2.3",
-    "vue2-ace-editor": "0.0.11"
+    "vue2-ace-editor": "0.0.11",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.1",
