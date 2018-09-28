@@ -145,10 +145,6 @@ export default {
       get () { return this.$store.state.selected.edit },
       set (value) { this.updateSelected({ target: 'edit', value: value}) }
     },
-    precEdit: {
-      get () { return this.$store.state.selected.prev },
-      set (value) { this.updateSelected({ target: 'prev', value: value}) }
-    },
     selAlt: {
       get () { return this.$store.state.selected.alt },
       set (value) { this.updateSelected({ target: 'alt', value: value}) }
@@ -232,7 +228,7 @@ Avec espace : ${this.count.all}`;
         return (this.selEdit) ? (this.$refs[this.selEdit] ? this.$refs[this.selEdit][0] : null ) : null;
     },
     SetEdit: function(ID, ext) {
-      this.Editors[ID] = Object.assign(this.Editors[ID] || {}, ext);
+      Vue.set(this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext));
     },
     waitNext: function(cb) {
       let vm = this;
@@ -317,7 +313,7 @@ Avec espace : ${this.count.all}`;
         Content: ""
       });
       vm.selEdit = ID;
-      vm.Resize( () => { vm.precEdit = ID })
+      vm.Resize()
     },
     toClose: function(ID) {
       let vm = this;
@@ -329,7 +325,7 @@ Avec espace : ${this.count.all}`;
       }
       vm.selEdit = Sel;
       vm.$delete( vm.Editors, ID );
-      vm.Resize( () => { vm.precEdit = Sel })
+      vm.Resize()
     },
     toExport: function() {
       ipcRenderer.send('print-pdf', this.marked);
@@ -399,7 +395,7 @@ Avec espace : ${this.count.all}`;
             Content: data
           });
           vm.selEdit = ID;
-          vm.Resize( () => { vm.precEdit = ID })
+          vm.Resize()
         });
       }
     },
@@ -416,7 +412,7 @@ Avec espace : ${this.count.all}`;
     Select: function(id) {
       let vm = this;
       vm.selEdit = id;
-      vm.Resize( () => { vm.precEdit = id })
+      vm.Resize()
     },
     SelAlt: function(sel) {
       this.selAlt = sel;
@@ -429,7 +425,7 @@ Avec espace : ${this.count.all}`;
       }
     },
     Unconfig: function(conf) {
-      thisinvertConfig(conf)
+      this.invertConfig(conf)
       this.Reconfig();
     },
     Reconfig: function() { // TO REFACTOR
@@ -467,8 +463,8 @@ Avec espace : ${this.count.all}`;
       Object.assign(vm.Editors, copie);
     }
 
-    vm.importState();
-    vm.Reconfig();
+      vm.importState();
+      vm.Reconfig();
 
     ipcRenderer.on('closing', function() {
       let copie = Object.assign(vm.Editors);

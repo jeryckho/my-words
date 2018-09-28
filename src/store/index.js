@@ -18,7 +18,6 @@ export default new Vuex.Store({
     },
     selected: {
       edit: "",
-      prev: "",
       alt: "sRendu"
     },
     dossier: "",
