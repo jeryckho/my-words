@@ -21,6 +21,12 @@ export default new Vuex.Store({
       alt: "sRendu"
     },
     dossier: "",
+    edits: {},
+    editList: []
+  },
+  getters: {
+    editSet: state => state.editList.map( editId => state.edits[editId] ),
+    isInEdit: state => id => state.editList.includes(id),
   },
   mutations: {
     updateShown(state, payload)     { fUpdateShown(state, payload) },
@@ -31,6 +37,8 @@ export default new Vuex.Store({
 
     updateSelected(state, payload)  { fUpdate(state, payload, 'selected') },
     updateDossier(state, value)     { state.dossier = value },
+
+    updateEdits(state, payload)     { state.edits = payload },
 
     importState(state) {
       let loc;
@@ -60,8 +68,6 @@ export default new Vuex.Store({
     }
 
   },
-  actions: {
-  },
   strict: true
 });
 
@@ -73,4 +79,7 @@ function fUpdateShown(state, payload) {
 }
 function fUpdateConfig(state, payload) {
   fUpdate(state, payload, 'config')
+}
+function fUpdateEdits(state, payload) {
+  fUpdate(state, payload, 'edits')
 }

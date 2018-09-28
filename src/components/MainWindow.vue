@@ -117,7 +117,7 @@ export default {
   data() {
     return {
       CtxMenu: {},
-      Editors: {},
+      // Editors: {},
       Master: "",
     }
   },
@@ -152,6 +152,11 @@ export default {
     Dossier: {
       get () { return this.$store.state.dossier },
       set (value) { this.updateDossier(value) }
+    },
+
+    Editors: {
+      get () { return this.$store.state.edits },
+      set (value) { this.updateEdits(value) }
     },
 
     hasMod: function() {
@@ -228,7 +233,12 @@ Avec espace : ${this.count.all}`;
         return (this.selEdit) ? (this.$refs[this.selEdit] ? this.$refs[this.selEdit][0] : null ) : null;
     },
     SetEdit: function(ID, ext) {
-      Vue.set(this.Editors, ID, Object.assign(this.Editors[ID] || {}, ext));
+      let vm = this;
+      // if (ID in vm.Editors) {
+        // vm.Editors[ID] = {...vm.Editors[ID], ...sext}
+      // } else {
+        vm.Editors[ID] =  {...ext}
+      // }
     },
     waitNext: function(cb) {
       let vm = this;
