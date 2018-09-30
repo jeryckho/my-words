@@ -72,6 +72,7 @@
                   @init="editorInit"
                   lang="markdown"
                   theme="chrome"
+                  @click.right.native="clkCtx"
                   @input="setMaster"
                 >
                 </editor>
@@ -86,12 +87,11 @@
       </PaneGroup>
     </WindowContent>
     <Toolbar type="footer"><span class="FFile stayFit pull-left">{{Footer}}</span><span :title="showCount" class="Details stayFit pull-right">{{count.words}} mots</span><span v-if="'objectif' in mattered.data" class="Details stayFit pull-right">{{objectif}}</span></Toolbar>
-    <div class="hidden">{{hasMod}}</div>
+    <div class="hidden">{{hasMod}} / {{counter}}</div>
   </Window>
 </template>
 
 <script>
-import Vue from 'vue'
 import { mapState, mapMutations } from 'vuex'
 import jthf from "json-to-html-form"
 import VueSplit from "./VueSplit.vue";
@@ -117,6 +117,7 @@ export default {
     return {
       CtxMenu: {},
       Master: "",
+      counter: 0,
     }
   },
 
@@ -159,6 +160,7 @@ export default {
     },
 
     hasMod: function() {
+      let ct = this.counter++;
       let mod = this.$store.getters.hasMod();
       ipcRenderer.send('update-notify-value', mod ? "1" : "0");
       return mod;
@@ -231,6 +233,7 @@ Avec espace : ${this.count.all}`;
     },
     waitNext: function(cb) {
       let vm = this;
+      vm.counter++;
       vm.$nextTick(() => {
         let editor = vm.editor()
         if (editor && editor.editor) {
@@ -312,7 +315,7 @@ Avec espace : ${this.count.all}`;
         Content: ""
       });
       vm.selEdit = ID;
-      vm.Resize()
+      vm.Resize(() => vm.$forceUpdate())
     },
     toClose: function(ID) {
       let vm = this;
@@ -324,7 +327,7 @@ Avec espace : ${this.count.all}`;
       }
       vm.selEdit = Sel;
       vm.deleteEdit({ ID });
-      vm.Resize()
+      vm.Resize(() => vm.$forceUpdate())
     },
     toExport: function() {
       ipcRenderer.send('print-pdf', this.marked);
@@ -354,7 +357,7 @@ Avec espace : ${this.count.all}`;
               vm.modifyEdit( { ID: Sel, Changed: false })
             });
           }
-          vm.waitNext();
+          vm.waitNext(() => vm.$forceUpdate());
         }
       }
     },
@@ -394,7 +397,7 @@ Avec espace : ${this.count.all}`;
             Content: data
           });
           vm.selEdit = ID;
-          vm.Resize()
+          vm.Resize(() => vm.$forceUpdate())
         });
       }
     },
