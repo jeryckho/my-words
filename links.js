@@ -29,4 +29,6 @@ links = {
 
 	PDF: "https://medium.com/@ishwar.rimal/generating-pdf-with-electron-js-31b59ac93249",
 	PDF2: "https://gist.github.com/dannvix/dc0efdbb75bf79a79d1c",
+
+	Search: "https://ace.c9.io/#nav=api&api=search",
 }

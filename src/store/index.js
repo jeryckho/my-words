@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import fs from "fs";
 
 Vue.use(Vuex);
 
@@ -59,10 +60,10 @@ export default new Vuex.Store({
       if (loc != null) {
         let copie = JSON.parse(loc);
         for(let item in copie) {
-          // if (!copie[item].Changed) {
-          //   let data = fs.readFileSync(copie[item].Path, 'utf8');
-          //   copie[item].Content = data;
-          // }
+          if (!copie[item].Changed) {
+            let data = fs.readFileSync(copie[item].Path, 'utf8');
+            copie[item].Content = data;
+          }
         }
         state.edits = copie
         state.editList = Object.keys(copie)
@@ -88,9 +89,9 @@ export default new Vuex.Store({
     exportState(state) {
       let copie = { ...state.edits};
       for(let item in copie) {
-        // if (!copie[item].Changed) {
-        //   delete copie[item].Content;
-        // }
+        if (!copie[item].Changed) {
+          delete copie[item].Content;
+        }
       }
       window.localStorage.setItem('Editors', JSON.stringify(copie));
       window.localStorage.setItem('Shown', JSON.stringify(state.shown));

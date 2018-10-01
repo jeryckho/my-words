@@ -1,3 +1,12 @@
+[] SideBar
+[] Alternative MD (dans altPane)
+[] Shell selon settings
+[] paramétrage PDF
+[] Ctrl + F / Ctrl + H
+[] Composant Metadonnées
+[] Spell Check / Grammalecte
+[] GDrive
+
 [X] Span dans footer
 [X] Compte des mots
 [X] Calcul du BaseName
@@ -6,20 +15,12 @@
 [X] Config Editor
 [X] Menu contextuel
 [X] Shell to Wikipedia / Synonyme / Conjugueur
-[] Spell Check / Grammalecte
-[] SideBar
-[] Alternative MD (dans altPane)
-[] GDrive
 [X] Bug splitView <=> Resize
 [X] Save Config
-[] Shell selon settings
 [X] Bug Changed
 [X] Empecher le drop de fichiers
-[] Composant Metadonnées
 [X] Save Etat (dont Changed)
 [X] Generate PDF
 [X] Bug nb char sur autoload
-[] Bug multi config
-[] bug Save Etat
-[] paramétrage PDF
-[] Ctrl + F / Ctrl + H
+[X] bug Save Etat
+[X] Bug multi config

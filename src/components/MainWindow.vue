@@ -429,9 +429,9 @@ Avec espace : ${this.count.all}`;
     },
     Unconfig: function(conf) {
       this.invertConfig(conf)
-      this.Reconfig();
+      this.ReconfigAll();
     },
-    Reconfig: function() { // TO REFACTOR
+    Reconfig: function() {
       let editor = this.editor()
       if (editor && editor.editor) {
         let Zeditor = editor.editor;
@@ -443,6 +443,24 @@ Avec espace : ${this.count.all}`;
         Zeditor.getSession().setUseSoftTabs(true);
         this.waitNext();
       }
+    },
+    ReconfigAll: function() {
+      let vm = this;
+      for (let sel of vm.EditorList) {
+        if (vm.$refs[sel]) {
+          let editor = vm.$refs[sel][0];
+          if (editor && editor.editor) {
+            let Zeditor = editor.editor;
+            Zeditor.setWrapBehavioursEnabled(true);
+            Zeditor.setShowInvisibles(vm.configShowInvisibles);
+            Zeditor.setShowFoldWidgets(vm.configShowFoldWidgets);
+            Zeditor.setShowPrintMargin(vm.configShowPrintMargin);
+            Zeditor.getSession().setUseWrapMode(vm.configUseWrapMode);
+            Zeditor.getSession().setUseSoftTabs(true);
+          }
+        }
+      }
+      vm.waitNext();
     }
   },
 
@@ -461,7 +479,7 @@ Avec espace : ${this.count.all}`;
 
     vm.$nextTick(function () {
       vm.importState();
-      vm.Reconfig();
+      vm.waitNext(() => { vm.ReconfigAll() })
 
       const template = [
         {
