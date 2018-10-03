@@ -113,6 +113,5 @@ function fUpdateShown(state, payload) {
 function fUpdateConfig(state, payload) {
   fUpdate(state, payload, 'config')
 }
-function fUpdateEdits(state, payload) {
-  fUpdate(state, payload, 'edits')
-}
+// eslint-disable-next-line
+function fUpdateEdits(state, payload) { fUpdate(state, payload, 'edits') }

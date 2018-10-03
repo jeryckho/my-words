@@ -160,6 +160,7 @@ export default {
     },
 
     hasMod: function() {
+      // eslint-disable-next-line
       let ct = this.counter++;
       let mod = this.$store.getters.hasMod();
       ipcRenderer.send('update-notify-value', mod ? "1" : "0");
@@ -347,15 +348,13 @@ Avec espace : ${this.count.all}`;
             });
             if (typeof fileName !== 'undefined') {
               // eslint-disable-next-line
-              fs.writeFile(fileName, Item.Content, function(err, data) {
-                vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
-              });
+              fs.writeFileSync(fileName, Item.Content);
+              vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
             }
           } else {
             // eslint-disable-next-line
-            fs.writeFile(Item.Path, Item.Content, function(err, data) {
-              vm.modifyEdit( { ID: Sel, Changed: false })
-            });
+            fs.writeFileSync(Item.Path, Item.Content);
+            vm.modifyEdit( { ID: Sel, Changed: false })
           }
           vm.waitNext(() => vm.$forceUpdate());
         }
