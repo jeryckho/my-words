@@ -39,7 +39,7 @@
     </Toolbar>
     <WindowContent>
       <PaneGroup>
-        <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}">{{Dossier}}</Pane>
+        <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}"><VueTree :folder="Dossier"></VueTree></Pane>
         <Pane>
           <VueSplit
             :elements="panes"
@@ -95,6 +95,7 @@
 import { mapState, mapMutations } from 'vuex'
 import jthf from "json-to-html-form"
 import VueSplit from "./VueSplit.vue";
+import VueTree from "./VueTree.vue";
 import { Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem } from "vue-photonkit";
 import * as matter from 'gray-matter';
 import Marked from "marked"
@@ -464,7 +465,7 @@ Avec espace : ${this.count.all}`;
   },
 
   components: {
-    VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem,
+    VueTree, VueSplit, Window, WindowContent, PaneGroup, Pane, Toolbar, ToolbarActions, ButtonGroup, Button, Icon, TabGroup, TabItem,
     editor: require('vue2-ace-editor')
   },
 
