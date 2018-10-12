@@ -21,6 +21,7 @@ links = {
 	Tree4: "https://github.com/fluency03/vue-json-form",
 
 	TreeView: "https://itnext.io/a-file-system-browser-component-for-electron-vue-js-applications-eab285fbb3cb",
+	walk: require('walkdir'),
 
 	Upload: "https://www.vuescript.com/vue-js-base64-file-upload/",
 

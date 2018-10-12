@@ -1,15 +1,17 @@
 <template lang="html">
   <div class="split-container">
-    {{folder}}
+    {{paths}}
   </div>
 </template>
 
 <script type="text/javascript">
+import walkdir from "walkdir"
 
 export default {
   name: "VueTree",
   data: function() {
     return {
+      
     }
   },
 
@@ -19,6 +21,18 @@ export default {
       type: String,
       default: ''
     },
+  },
+
+  asyncComputed: {
+    paths: {
+      get () {
+        let vm = this;
+        return new Promise((resolve, reject) => {
+          walkdir.sync(vm.folder, (path, stat) => resolve(path))
+        })
+      },
+      default: "-"
+    }
   },
 
   mounted () {
