@@ -28,7 +28,12 @@ export default {
       get () {
         let vm = this;
         return new Promise((resolve, reject) => {
-          walkdir.sync(vm.folder, (path, stat) => resolve(path))
+          let lg = vm.folder.length + 1;
+          let pts = [];
+          let walk = walkdir(vm.folder);
+          walk.on("path", (path) => { pts.push(path.slice(lg)) })
+          walk.on("end", () => resolve(pts));
+          walk.on("error", (err)=> reject(err))
         })
       },
       default: "-"
