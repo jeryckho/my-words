@@ -1,4 +1,3 @@
-[] SideBar
 [] Alternative MD (dans altPane)
 [] Shell selon settings
 [] paramétrage PDF
@@ -25,3 +24,4 @@
 [X] Bug nb char sur autoload
 [X] bug Save Etat
 [X] Bug multi config
+[X] SideBar

@@ -39,7 +39,9 @@
     </Toolbar>
     <WindowContent>
       <PaneGroup>
-        <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}"><VueTree :folder="Dossier"></VueTree></Pane>
+        <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}" style="overflow-y:auto;">
+          <VueTree :folder="Dossier" @clicknode="nodeClick"/>
+        </Pane>
         <Pane>
           <VueSplit
             :elements="panes"
@@ -371,6 +373,22 @@ Avec espace : ${this.count.all}`;
       if (fileNames !== undefined) {
         vm.Dossier = fileNames[0];
       }
+    },
+    nodeClick: function(e,n) {
+      let vm = this;
+      let ID = path.normalize(n.data.pathname);
+      fs.readFile(ID, 'utf8', function (err, data) {
+        vm.createEdit( {
+          ID: ID,
+          Title: path.basename(ID),
+          Path: ID,
+          New: false,
+          Changed: false,
+          Content: data
+        });
+        vm.selEdit = ID;
+        vm.Resize(() => vm.$forceUpdate())
+      });
     },
     toLoad: function() {
       var vm = this;
