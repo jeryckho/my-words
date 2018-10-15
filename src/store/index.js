@@ -44,7 +44,8 @@ export default new Vuex.Store({
 
     createEdit(state, payload) {
       state.edits[payload.ID] = payload;
-      state.editList.push(payload.ID);
+      if (state.editList.indexOf(payload.ID) === -1)
+        state.editList.push(payload.ID);
     },
     modifyEdit(state, payload) {
       state.edits[payload.ID] = {...state.edits[payload.ID], ...payload};      

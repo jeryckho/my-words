@@ -28,11 +28,22 @@ links = {
 
 	GDrive: "https://github.com/tralves/vue-gdrive",
 
-	SpellCheck1: "https://github.com/ajaxorg/ace/wiki/Syntax-validation",
-	SpellCheck2: "https://stackoverflow.com/questions/21284979/ace-editor-customizing-syntax-error-gutter",
+	SpellCheck: [
+		"https://github.com/ajaxorg/ace/wiki/Syntax-validation",
+		"https://stackoverflow.com/questions/21284979/ace-editor-customizing-syntax-error-gutter",
+		"https://github.com/electron-userland/electron-spellchecker",
+		"https://ourcodeworld.com/articles/read/485/how-to-implement-and-enable-the-grammar-and-spellchecker-in-electron-framework",
+	],
 
-	PDF: "https://medium.com/@ishwar.rimal/generating-pdf-with-electron-js-31b59ac93249",
-	PDF2: "https://gist.github.com/dannvix/dc0efdbb75bf79a79d1c",
+	PDF: [
+		"https://medium.com/@ishwar.rimal/generating-pdf-with-electron-js-31b59ac93249",
+		"https://gist.github.com/dannvix/dc0efdbb75bf79a79d1c",
+	],
+
+	Settings: [
+		"https://www.npmjs.com/package/electron-config",
+		"https://www.npmjs.com/package/electron-settings",
+	],
 
 	Search: "https://ace.c9.io/#nav=api&api=search",
 }
