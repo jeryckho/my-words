@@ -344,7 +344,15 @@ Avec espace : ${this.count.all}`;
           ]
         });
         if (typeof fileName !== 'undefined') {
-          ipcRenderer.send('print-pdf', {file:fileName, mk:this.marked});
+          let options = { file:fileName, mk:this.marked };
+          if ('title' in this.mattered.data) {
+            options.title = this.mattered.data.title;
+          }
+          if ('style' in this.mattered.data) {
+            options.style = this.mattered.data.style;
+          }
+
+          ipcRenderer.send('print-pdf', options);
         }
       }
     },

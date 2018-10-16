@@ -112,7 +112,9 @@ ipcMain.on('ok-to-close', function() {
 ipcMain.on('print-pdf', function(event, arg) {
 
   let window_to_PDF = new BrowserWindow({show : false});
-  let htm = `<html><head><style>p {text-align:justify}</style></head><body>${arg.mk}</body></html>`;
+  let title = arg.title ? `<h1>${arg.title}</h1>` : '';
+  let style = arg.style ? arg.style : 'p {text-align:justify}';
+  let htm = `<html><head><style>${style}</style></head><body>${title}${arg.mk}</body></html>`;
 
   window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(htm));
   window_to_PDF.webContents.on('did-finish-load', () => {
