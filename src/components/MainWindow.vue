@@ -428,6 +428,7 @@ Avec espace : ${this.count.all}`;
       require('brace/ext/language_tools') //language extension prerequsite...
       require('brace/mode/markdown')    //language
       require('brace/theme/chrome')
+      require('brace/ext/searchbox')
       this.Reconfig();
     },
     Select: function(id) {
@@ -509,6 +510,7 @@ Avec espace : ${this.count.all}`;
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
               { label:'Exporter', accelerator: 'CommandOrControl+P', click: vm.toExport },
               {type: 'separator'},
+              { label:'Chercher', accelerator: 'CommandOrControl+F' },
               { label:'Quitter', role: 'quit'}
           ]
         },

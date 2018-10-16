@@ -44,6 +44,16 @@ export default {
       if (node.isLeaf) {
         vm.$emit('clicknode', event, node);
       }
+    },
+    sortTree: function(a,b) {
+      if (a.data.type === b.data.type) {
+        if (a.title > b.title) { return 1; }
+        if (a.title < b.title) { return -1; }
+        return 0;
+      } else {
+        if (a.data.type === "DIRECTORY") { return -1; }
+        else { return 1; }
+      }
     }
   },
 
@@ -103,6 +113,7 @@ export default {
             }; 
             if (!newnode.isLeaf) newnode.children = [];
             curnodes.push(newnode)
+            curnodes.sort(this.sortTree)
           })
           walk.on("end", () => resolve(lstPath));
           walk.on("error", (err)=> reject(err))
