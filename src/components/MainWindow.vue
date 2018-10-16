@@ -334,7 +334,27 @@ Avec espace : ${this.count.all}`;
       vm.Resize(() => vm.$forceUpdate())
     },
     toExport: function() {
-      ipcRenderer.send('print-pdf', this.marked);
+      var vm = this;
+      let Sel = vm.selEdit;
+      if (Sel != "") {
+        var fileName = dialog.showSaveDialog(getCurrentWindow(), {
+          filters: [
+            { name: 'PDF', extensions: ['pdf'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        });
+        if (typeof fileName !== 'undefined') {
+          let options = { file:fileName, mk:this.marked };
+          if ('title' in this.mattered.data) {
+            options.title = this.mattered.data.title;
+          }
+          if ('style' in this.mattered.data) {
+            options.style = this.mattered.data.style;
+          }
+
+          ipcRenderer.send('print-pdf', options);
+        }
+      }
     },
     toSave: function() {
       var vm = this;
@@ -428,6 +448,7 @@ Avec espace : ${this.count.all}`;
       require('brace/ext/language_tools') //language extension prerequsite...
       require('brace/mode/markdown')    //language
       require('brace/theme/chrome')
+      require('brace/ext/searchbox')
       this.Reconfig();
     },
     Select: function(id) {
@@ -509,6 +530,7 @@ Avec espace : ${this.count.all}`;
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
               { label:'Exporter', accelerator: 'CommandOrControl+P', click: vm.toExport },
               {type: 'separator'},
+              { label:'Chercher', accelerator: 'CommandOrControl+F' },
               { label:'Quitter', role: 'quit'}
           ]
         },
