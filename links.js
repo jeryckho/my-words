@@ -45,5 +45,8 @@ links = {
 		"https://www.npmjs.com/package/electron-settings",
 	],
 
-	Search: "https://ace.c9.io/#nav=api&api=search",
+	Search: [
+		"https://ace.c9.io/#nav=api&api=search",
+		"https://jsfiddle.net/_kemar/3rg6a09b/",
+	]
 }

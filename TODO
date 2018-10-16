@@ -1,7 +1,5 @@
 [] Alternative MD (dans altPane)
 [] Shell selon settings
-[] paramétrage PDF
-[] Ctrl + F / Ctrl + H
 [] Composant Metadonnées
 [] Spell Check / Grammalecte
 [] GDrive
@@ -25,3 +23,5 @@
 [X] bug Save Etat
 [X] Bug multi config
 [X] SideBar
+[X] Ctrl + F / Ctrl + H
+[X] paramétrage PDF
