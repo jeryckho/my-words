@@ -112,7 +112,7 @@ ipcMain.on('ok-to-close', function() {
 ipcMain.on('print-pdf', function(event, arg) {
 
   let window_to_PDF = new BrowserWindow({show : false});
-  let htm = `<html><head><style>p {text-align:justify}</style></head><body>${arg}</body></html>`;
+  let htm = `<html><head><style>p {text-align:justify}</style></head><body>${arg.mk}</body></html>`;
 
   window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(htm));
   window_to_PDF.webContents.on('did-finish-load', () => {
@@ -127,7 +127,7 @@ ipcMain.on('print-pdf', function(event, arg) {
           return;
       }
       try{
-          fs.writeFileSync('./generated_pdf.pdf', data);
+          fs.writeFileSync(arg.file, data);
       } catch(err){
       }
     })

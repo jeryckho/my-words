@@ -334,7 +334,19 @@ Avec espace : ${this.count.all}`;
       vm.Resize(() => vm.$forceUpdate())
     },
     toExport: function() {
-      ipcRenderer.send('print-pdf', this.marked);
+      var vm = this;
+      let Sel = vm.selEdit;
+      if (Sel != "") {
+        var fileName = dialog.showSaveDialog(getCurrentWindow(), {
+          filters: [
+            { name: 'PDF', extensions: ['pdf'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        });
+        if (typeof fileName !== 'undefined') {
+          ipcRenderer.send('print-pdf', {file:fileName, mk:this.marked});
+        }
+      }
     },
     toSave: function() {
       var vm = this;
