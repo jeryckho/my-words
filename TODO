@@ -1,9 +1,16 @@
-[] Alternative MD (dans altPane)
 [] Shell selon settings
 [] Composant Metadonnées
-[] Spell Check / Grammalecte
-[] GDrive
 [] Intercept images (+base64)
+
+[] Recherche dans dossiers/projet
+[] Spell Check / Grammalecte
+[] Follow MD place in Alt
+[] Fermer projet
+[] Projets récents
+[] Template CSS pour export
+[] Export multiple
+[] GDrive
+[] Meilleur Sidebar (open + multi)
 
 [X] Span dans footer
 [X] Compte des mots
@@ -25,3 +32,4 @@
 [X] SideBar
 [X] Ctrl + F / Ctrl + H
 [X] paramétrage PDF
+[X] Alternative MD (dans altPane)

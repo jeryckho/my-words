@@ -32,7 +32,10 @@
             <Icon icon="doc-text"></Icon>
           </Button>
           <Button size="sm" :active="selAlt=='sFront'" @click.native="SelAlt('sFront')">
-            <Icon icon="info"></Icon>
+            <Icon icon="tag"></Icon>
+          </Button>
+          <Button size="sm" :active="selAlt=='sPinIt'" @click.native="SelAlt('sPinIt')">
+            <Icon icon="attach"></Icon>
           </Button>
         </ButtonGroup>
       </ToolbarActions>
@@ -40,7 +43,7 @@
     <WindowContent>
       <PaneGroup>
         <Pane size="sm" :sidebar="true" :class="{hidden: !shownSidebar}" style="overflow-y:auto;">
-          <VueTree :folder="Dossier" @clicknode="nodeClick"/>
+          <VueTree :folder="Dossier" @clicknode="nodeClick" @contextmenunode="nodeContextMenu"/>
         </Pane>
         <Pane>
           <VueSplit
@@ -83,6 +86,7 @@
             <div id="altPane" :class="{hidden: !shownAltPane}" style="overflow-y:auto;">
               <div v-if="selEdit != ''" v-html="marked" :class="{hidden: selAlt != 'sRendu'}"></div>
               <div v-if="selEdit != ''" v-html="jshtm" :class="{hidden: selAlt != 'sFront'}"></div>
+              <div v-if="selEdit != ''" v-html="pinned" :class="{hidden: selAlt != 'sPinIt'}"></div>
             </div>
           </VueSplit>
         </Pane>
@@ -119,6 +123,9 @@ export default {
   data() {
     return {
       CtxMenu: {},
+      CtxSideBar: {},
+      SidePath: "",
+      pinned: "Epinglez un contenu avec Clic-droit.",
       Master: "",
       counter: 0,
     }
@@ -394,6 +401,25 @@ Avec espace : ${this.count.all}`;
         vm.Dossier = fileNames[0];
       }
     },
+    nodeContextMenu: function(e,n) {
+      this.SidePath = path.normalize(n.data.pathname);
+      this.CtxSideBar.popup({window: getCurrentWindow()})
+      this.waitNext();
+    },
+    SBPinIt: function(){
+      let vm = this;
+      if (vm.SidePath !== "") {
+        let content;
+        if (vm.EditorList.indexOf(vm.SidePath) !== -1) {
+          content = vm.Editors[vm.SidePath].Content
+        } else {
+          content = fs.readFileSync(vm.SidePath, {encoding:'utf8'});
+        }
+        if (!vm.shownAltPane) { vm.Unshow('altPane') }
+        vm.SelAlt('sPinIt');
+        vm.pinned = Marked(matter(content).content);
+      }
+    },
     nodeClick: function(e,n) {
       let vm = this;
       let ID = path.normalize(n.data.pathname);
@@ -530,7 +556,6 @@ Avec espace : ${this.count.all}`;
               { label:'Enregistrer', accelerator: 'CommandOrControl+S', click: vm.toSave },
               { label:'Exporter', accelerator: 'CommandOrControl+P', click: vm.toExport },
               {type: 'separator'},
-              { label:'Chercher', accelerator: 'CommandOrControl+F' },
               { label:'Quitter', role: 'quit'}
           ]
         },
@@ -589,6 +614,12 @@ Avec espace : ${this.count.all}`;
       vm.CtxMenu.append(new MenuItem({label: 'Wikipedia', click() { vm.shellGo('https://fr.wikipedia.org','https://fr.wikipedia.org/wiki/') } }))
       vm.CtxMenu.append(new MenuItem({label: 'Le Conjugueur', click() { vm.shellGo('https://leconjugueur.lefigaro.fr','https://leconjugueur.lefigaro.fr/conjugaison/verbe/') } }))
       vm.CtxMenu.append(new MenuItem({label: 'Synonymes', click() { vm.shellGo('http://www.synonymes.com/','http://www.synonymes.com/synonyme.php?mot=') } }))
+
+      vm.CtxSideBar = new Menu();
+      // vm.CtxSideBar.append(new MenuItem({label: 'Ouvrir' }))
+      // vm.CtxSideBar.append(new MenuItem({label: 'Exporter' }))
+      vm.CtxSideBar.append(new MenuItem({label: 'Epingler', click: vm.SBPinIt }))
+
     })
   }
 }

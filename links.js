@@ -2,31 +2,40 @@
 links = {
 	Vue: "https://vuejs.org/v2/guide/",
 
-	GAPI: "https://developers.google.com/calendar/quickstart/nodejs",
-	VueGAPI: "https://github.com/cedpoilly/vue-gapi",
-	ElectonGAPI: "https://github.com/parro-it/electron-google-oauth",
+	GoogleAPI: [
+		"https://developers.google.com/calendar/quickstart/nodejs",
+		"https://github.com/cedpoilly/vue-gapi",
+		"https://github.com/parro-it/electron-google-oauth",
+		"https://github.com/tralves/vue-gdrive",
+	],
 
-	aceCld9: "https://ace.c9.io/",
-	brace: "https://github.com/thlorenz/brace",
-	useOfAceEditor: "https://github.com/sourcerer-io/electron-vue-buefy-editor/blob/master/src/renderer/components/EditorPage.vue",
+	AceEditor: [
+		"https://ace.c9.io/",
+		"https://github.com/thlorenz/brace",
+		"https://github.com/sourcerer-io/electron-vue-buefy-editor/blob/master/src/renderer/components/EditorPage.vue",
+	],
+
+	OtherEditor: "https://trix-editor.org/",
 
 	PhotonKit: "http://photonkit.com/components/",
 	VuePhotonKit: require('vue-photonkit'),
 
 	scrollTop: "https://developer.mozilla.org/fr/docs/Web/API/Element/scrollTop",
 
-	Tree1: "http://www.vuetoolbox.com/projects/vue-json-tree-view",
-	Tree2: "http://www.vuetoolbox.com/projects/vue-tree",
-	Tree3_Json: "https://jinkin1995.github.io/vue-json-edit/",
-	Tree4: "https://github.com/fluency03/vue-json-form",
+	JsonEditor: [
+		"https://jinkin1995.github.io/vue-json-edit/",
+		"https://github.com/fluency03/vue-json-form",
+		"http://www.vuetoolbox.com/projects/vue-json-tree-view",
+	],
 
-	TreeView: "https://itnext.io/a-file-system-browser-component-for-electron-vue-js-applications-eab285fbb3cb",
-	TreeVue: "https://fr.vuejs.org/v2/examples/tree-view.html",
+	Tree: [
+		"http://www.vuetoolbox.com/projects/vue-tree",
+		"https://itnext.io/a-file-system-browser-component-for-electron-vue-js-applications-eab285fbb3cb",
+		"https://fr.vuejs.org/v2/examples/tree-view.html",
+	],
 	walk: require('walkdir'),
 
 	Upload: "https://www.vuescript.com/vue-js-base64-file-upload/",
-
-	GDrive: "https://github.com/tralves/vue-gdrive",
 
 	SpellCheck: [
 		"https://github.com/ajaxorg/ace/wiki/Syntax-validation",
@@ -48,5 +57,10 @@ links = {
 	Search: [
 		"https://ace.c9.io/#nav=api&api=search",
 		"https://jsfiddle.net/_kemar/3rg6a09b/",
+	],
+
+	NumPag: [
+		"https://github.com/dompdf/dompdf/issues/571",
+		"https://stackoverflow.com/questions/20050939/print-page-numbers-on-pages-when-printing-html",
 	]
 }

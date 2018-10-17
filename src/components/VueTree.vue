@@ -1,7 +1,8 @@
 <template lang="html">
     <SlVueTree
       v-model="paths"
-      @nodeclick="nodeClick">
+      @nodeclick="nodeClick"
+      @nodecontextmenu="nodeContextMenu">
       <template slot="toggle" slot-scope="{ node }">
         <span v-if="!node.isLeaf">
           <Icon icon="right-open" v-if="!node.isExpanded"></Icon>
@@ -43,6 +44,12 @@ export default {
       let vm = this;
       if (node.isLeaf) {
         vm.$emit('clicknode', event, node);
+      }
+    },
+    nodeContextMenu: function(node, event) {
+      let vm = this;
+      if (node.isLeaf) {
+        vm.$emit('contextmenunode', event, node);
       }
     },
     sortTree: function(a,b) {
