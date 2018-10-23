@@ -62,5 +62,10 @@ links = {
 	NumPag: [
 		"https://github.com/dompdf/dompdf/issues/571",
 		"https://stackoverflow.com/questions/20050939/print-page-numbers-on-pages-when-printing-html",
-	]
+	],
+
+	Find: [
+		"https://www.npmjs.com/package/find-in-files",
+		"https://www.npmjs.com/package/replace",
+	],
 }
