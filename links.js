@@ -68,4 +68,8 @@ links = {
 		"https://www.npmjs.com/package/find-in-files",
 		"https://www.npmjs.com/package/replace",
 	],
+
+	Markdown: [
+		"https://github.com/evbacher/gd2md-html/wiki",
+	]
 }
