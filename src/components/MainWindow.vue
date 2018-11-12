@@ -296,13 +296,29 @@ Avec espace : ${this.count.all}`;
         this.waitNext();
       }
     },
-    shellGo: function(empty,full) {
+    diacri: function(elem) {
+      elem = elem.replace(/à/g,"%E0")
+      elem = elem.replace(/â/g,"%E2")
+      elem = elem.replace(/ç/g,"%E7")
+      elem = elem.replace(/è/g,"%E8")
+      elem = elem.replace(/é/g,"%E9")
+      elem = elem.replace(/ê/g,"%EA")
+      elem = elem.replace(/î/g,"%EE")
+      elem = elem.replace(/ô/g,"%F4")
+      elem = elem.replace(/ù/g,"%F9")
+      elem = elem.replace(/û/g,"%FB")
+      return elem;
+    },
+    shellGo: function(empty,full,keep) {
       let editor = this.editor()
       if (editor && editor.editor) {
         let selection = editor.editor.getSelection();
         if (! selection.isEmpty()) {
           let selectedRange = editor.editor.getSelectionRange();
           let selectedText = editor.editor.getSession().getDocument().getTextRange(selectedRange);
+          if (!keep) {
+            selectedText = this.diacri(selectedText)
+          }
           shell.openExternal(full + selectedText);
         } else {
           shell.openExternal(empty)
@@ -614,6 +630,7 @@ Avec espace : ${this.count.all}`;
       vm.CtxMenu.append(new MenuItem({label: 'Wikipedia', click() { vm.shellGo('https://fr.wikipedia.org','https://fr.wikipedia.org/wiki/') } }))
       vm.CtxMenu.append(new MenuItem({label: 'Le Conjugueur', click() { vm.shellGo('https://leconjugueur.lefigaro.fr','https://leconjugueur.lefigaro.fr/conjugaison/verbe/') } }))
       vm.CtxMenu.append(new MenuItem({label: 'Synonymes', click() { vm.shellGo('http://www.synonymes.com/','http://www.synonymes.com/synonyme.php?mot=') } }))
+      vm.CtxMenu.append(new MenuItem({label: 'Champs lexical', click() { vm.shellGo('https://www.rimessolides.com/motscles.aspx','https://www.rimessolides.com/motscles.aspx?m=', true) } }))
 
       vm.CtxSideBar = new Menu();
       // vm.CtxSideBar.append(new MenuItem({label: 'Ouvrir' }))
