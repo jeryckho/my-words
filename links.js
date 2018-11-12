@@ -71,5 +71,9 @@ links = {
 
 	Markdown: [
 		"https://github.com/evbacher/gd2md-html/wiki",
-	]
+	],
+
+	FrontMatter: [
+		"https://www.npmjs.com/package/front-matter",
+	],
 }
