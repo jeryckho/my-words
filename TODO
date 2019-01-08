@@ -1,3 +1,5 @@
+[] Bugfix changement nom
+[] Update split
 [] Shell selon settings
 [] Composant Metadonnées
 [] Intercept images (+base64)
@@ -33,4 +35,4 @@
 [X] Ctrl + F / Ctrl + H
 [X] paramétrage PDF
 [X] Alternative MD (dans altPane)
-[X] Bug Shell + update split
+[X] Bug Shell

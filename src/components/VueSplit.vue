@@ -90,18 +90,18 @@ export default {
   },
 
   updated () {
-    // this.instance.destroy();
-    // this.instance = Split(this.elements, {
-    //   direction: this.direction,
-    //   sizes: this.sizes,
-    //   minSize: this.minSize,
-    //   gutterSize: this.gutterSize,
-    //   snapOffset: this.snapOffset,
-    //   cursor: this.cursor,
-    //   onDrag: this.onDrag,
-    //   onDragStart: this.onDragStart,
-    //   onDragEnd: this.onDragEnd
-    // })
+    this.instance.destroy();
+    this.instance = Split(this.elements, {
+      direction: this.direction,
+      sizes: this.sizes,
+      minSize: this.minSize,
+      gutterSize: this.gutterSize,
+      snapOffset: this.snapOffset,
+      cursor: this.cursor,
+      onDrag: this.onDrag,
+      onDragStart: this.onDragStart,
+      onDragEnd: this.onDragEnd
+    })
   },
   methods: {
     onDrag() {

@@ -69,6 +69,7 @@ export default {
       get () {
         let vm = this;
         return new Promise((resolve, reject) => {
+          if (vm.folder === "") return resolve([]);
           let F = pathDirectories(vm.folder).length+1;
 
           let lstPath = [];
