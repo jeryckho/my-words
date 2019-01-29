@@ -402,9 +402,11 @@ Avec espace : ${this.count.all}`;
                   size
                 });
               }
-              // eslint-disable-next-line
-              fs.writeFileSync(fileName, Item.Content);
-              vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName })
+              vm.waitNext(() => {
+                // eslint-disable-next-line
+                fs.writeFileSync(fileName, Item.Content);
+                vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName });
+              });
             }
           } else {
             if (("keep" in vm.mattered.data) && (vm.mattered.data.keep == true)) {
@@ -416,9 +418,11 @@ Avec espace : ${this.count.all}`;
                 size
               });
             }
-            // eslint-disable-next-line
-            fs.writeFileSync(Item.Path, Item.Content);
-            vm.modifyEdit( { ID: Sel, Changed: false })
+            vm.waitNext(() => {
+              // eslint-disable-next-line
+              fs.writeFileSync(Item.Path, Item.Content);
+              vm.modifyEdit( { ID: Sel, Changed: false });
+            });
           }
           vm.waitNext(() => vm.$forceUpdate());
         }
