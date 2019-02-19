@@ -404,7 +404,7 @@ Avec espace : ${this.count.all}`;
               }
               vm.waitNext(() => {
                 // eslint-disable-next-line
-                fs.writeFileSync(fileName, Item.Content);
+                fs.writeFileSync(fileName, vm.Editors[vm.selEdit].Content);
                 vm.modifyEdit( { ID: Sel, New: false, Changed: false, Title: path.basename(fileName), Path: fileName });
               });
             }
@@ -420,7 +420,7 @@ Avec espace : ${this.count.all}`;
             }
             vm.waitNext(() => {
               // eslint-disable-next-line
-              fs.writeFileSync(Item.Path, Item.Content);
+              fs.writeFileSync(Item.Path, vm.Editors[vm.selEdit].Content);
               vm.modifyEdit( { ID: Sel, Changed: false });
             });
           }
