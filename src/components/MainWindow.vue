@@ -363,6 +363,7 @@ Avec espace : ${this.count.all}`;
         var fileName = dialog.showSaveDialog(getCurrentWindow(), {
           filters: [
             { name: 'PDF', extensions: ['pdf'] },
+            { name: 'Web', extensions: ['htm','html'] },
             { name: 'All Files', extensions: ['*'] }
           ]
         });
@@ -373,6 +374,9 @@ Avec espace : ${this.count.all}`;
           }
           if ('style' in this.mattered.data) {
             options.style = this.mattered.data.style;
+          }
+          if ('pagination' in this.mattered.data) {
+            options.pg = this.mattered.data.pagination;
           }
 
           ipcRenderer.send('print-pdf', options);

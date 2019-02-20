@@ -113,25 +113,37 @@ ipcMain.on('print-pdf', function(event, arg) {
 
   let window_to_PDF = new BrowserWindow({show : false});
   let title = arg.title ? `<h1>${arg.title}</h1>` : '';
+  let footer = arg.pg ? `<div class="footer">${arg.pg}<span class="pagenum"></span></div>` : ''; 
   let style = arg.style ? arg.style : 'p {text-align:justify}';
-  let htm = `<html><head><style>${style}</style></head><body>${title}${arg.mk}</body></html>`;
+  if (arg.pg) {
+    style = style + " .footer { position: fixed; bottom: 0px; } .pagenum:before { content: counter(page); }";
+  }
+  let htm = `<html><head><meta charset="utf-8"><style>${style}</style></head><body>${footer}${title}${arg.mk}</body></html>`;
 
-  window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(htm));
-  window_to_PDF.webContents.on('did-finish-load', () => {
-    window_to_PDF.webContents.printToPDF({
-      landscape: false,
-      marginsType: 0,
-      printBackground: false,
-      printSelectionOnly: false,
-      pageSize: "A4",
-    }, function(err, data) {
-      if (err) {
-          return;
-      }
-      try{
-          fs.writeFileSync(arg.file, data);
-      } catch(err){
-      }
+  toString
+  if (arg.file.endsWith('pdf')) {
+    window_to_PDF.loadURL("data:text/html;charset=utf-8," + encodeURI(htm));
+    window_to_PDF.webContents.on('did-finish-load', () => {
+      window_to_PDF.webContents.printToPDF({
+        landscape: false,
+        marginsType: 0,
+        printBackground: false,
+        printSelectionOnly: false,
+        pageSize: "A4",
+      }, function(err, data) {
+        if (err) {
+            return;
+        }
+        try{
+            fs.writeFileSync(arg.file, data);
+        } catch(err){
+        }
+      })
     })
-  })
+  } else {
+    try{
+      fs.writeFileSync(arg.file, htm);
+    } catch(err){
+    }
+  }
 })
